@@ -30,19 +30,22 @@ def find_location(img, database, pose):
 	# Search the close images for one that matches our location
 	error_database = []
 	for data in database_temp:
-		img_diff = cv2.subtract(img,data.img)
-		error = np.mean(img_diff)/255
+		img_diff = abs(img.astype(int) - data.img.astype(int))
+		img_diff = np.array(img_diff,dtype = np.uint8)
+		
+		error = np.mean(img_diff)
 		error_database.append((error, data.pose))
 
 		# im_stack = np.hstack((data.img,img))
 		# im_stack = np.hstack((im_stack, img_diff))
 		# cv2.imshow("Database img, current image, difference", im_stack)
-		# cv2.waitKey(0)	
+		# print("Error is " + str(error))	
+		# cv2.waitKey(1500)
 	# Use the pose with the lowest error
 	
 	# cv2.destroyAllWindows()
 	error_database.sort(key=lambda tup: tup[0])
-	return (error_database[0][1])
+	return (error_database[0][1], error_database[0][0])
 
 def build_database():
 	database = []
@@ -63,16 +66,16 @@ pose_current = class_info.Pose(1.5,0,0)
 
 while 1:
 	# When ready capture an image
-	key = raw_input("Enter any key to check")
-	if key == 'E' or key == 'e':
-		break
+	# key = raw_input("Enter any key to check (e or E to exit)")
+	# if key == 'E' or key == 'e':
+	# 	break
 	capture = get_image()
 
 	# Image search for closest image
-	new_pose = find_location(capture, database, pose_current)
+	new_pose, error = find_location(capture, database, pose_current)
 
 	# Print answer
-	print(new_pose.x)
+	print("Pos : " + str(new_pose.x) + " Error : " + str(error))
 
 # Close camera
 	
