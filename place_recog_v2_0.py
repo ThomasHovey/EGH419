@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import class_info
 
-POSE_TOLERANCE = 5
+POSE_TOLERANCE = 10
 
 # Camera 0 is the integrated web cam on my netbook
 camera_port = 0
@@ -36,11 +36,11 @@ def find_location(img, database, pose):
 		error = np.mean(img_diff)
 		error_database.append((error, data.pose))
 
-		# im_stack = np.hstack((data.img,img))
-		# im_stack = np.hstack((im_stack, img_diff))
-		# cv2.imshow("Database img, current image, difference", im_stack)
-		# print("Error is " + str(error))	
-		# cv2.waitKey(1500)
+		im_stack = np.hstack((data.img,img))
+		im_stack = np.hstack((im_stack, img_diff))
+		cv2.imshow("Database img, current image, difference", im_stack)
+		#print("Error is " + str(error))	
+		cv2.waitKey(100)
 	# Use the pose with the lowest error
 	
 	# cv2.destroyAllWindows()
