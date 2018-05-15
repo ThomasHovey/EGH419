@@ -7,7 +7,7 @@ import time
 
 # Setup PiCamera
 camera = PiCamera()
-camera.resolution = (1280,720)
+camera.resolution = (340,120)
 camera.framerate = 30
 #Wait
 time.sleep(2.0)
@@ -35,6 +35,7 @@ def get_img():
 
 while (1):
 	img = get_img()
-	cv2.imshow(img)
-	cv2.waitKey(0)
+	cv2.imshow('ShowImg',img)
+	cv2.waitKey(20)
+	rawCapture.truncate(0) 
 
