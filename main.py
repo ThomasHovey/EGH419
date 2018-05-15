@@ -15,7 +15,7 @@ camera.shutter_speed = camera.exposure_speed
 camera.exposure_mode = 'off'
 g = camera.awb_gains
 camera.awb_mode = 'off'
-camera.aw_gains = g
+camera.awb_gains = g
 
 rawCapture = PiRGBArray(camera)
 
