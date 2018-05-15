@@ -28,7 +28,7 @@ def get_img():
 	# Convert to CV2 img
 	img = rawCapture.array
 	# Convert to grayscale
-	img_gray = cv2.cvtColour(img,cv2.COLOR_BGR2GRAY)
+	img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
 	return img_gray
 
