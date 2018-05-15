@@ -2,13 +2,9 @@ import cv2
 import numpy as np
 import class_info
 
-POSE_TOLERANCE = 10
 
-# Camera 0 is the integrated web cam on my netbook
-camera_port = 0
- 
-# Now we can initialize the camera capture object with the cv2.VideoCapture class.
-# All it needs is the index to a camera port.
+# Tuning Constants
+POSE_TOLERANCE = 10
 
 
 # Captures a single image from the camera and returns it in PIL format
