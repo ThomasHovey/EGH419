@@ -24,7 +24,7 @@ def readSerial(State.state):
 
     # Wait for info
 
-    state.LeftEncoder = 
+    state.LeftDistance = 
 
 
 
@@ -35,4 +35,3 @@ def readSerial(State.state):
 def writeSerial(State.state):
 
     #Write updated motor speeds
-    
