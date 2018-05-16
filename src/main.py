@@ -7,11 +7,13 @@ import modules.place_recog as place_recog
 from modules.classes.Pose import Pose
 from modules.classes.ImageData import ImageData
 
+xmap = np.load('modules/data/xmap.npy')
+ymap = np.load('modules/data/ymap.npy')
 
 time.sleep(0.1)
 
-def setup():
-	place_recog.setup()
+#def setup():
+	#place_recog.setup()
 
 while (1):
 	img = place_recog.get_img()

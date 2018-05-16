@@ -10,27 +10,23 @@ from classes.ImageData import ImageData
 # Tuning Constants
 POSE_TOLERANCE = 10
 
+# Setup camera
+camera = PiCamera()
+camera.resolution = (1296,972)
+camera.framerate = 30
+#Wait
+time.sleep(1.0)
+camera.shutter_speed = camera.exposure_speed
+camera.exposure_mode = 'off'
+g = camera.awb_gains
+camera.awb_mode = 'off'
+camera.awb_gains = g
 
-def setup():
-	# Setup PiCamera
-	camera = PiCamera()
-	camera.resolution = (1296,972)
-	camera.framerate = 30
-	#Wait
-	time.sleep(1.0)
-	camera.shutter_speed = camera.exposure_speed
-	camera.exposure_mode = 'off'
-	g = camera.awb_gains
-	camera.awb_mode = 'off'
-	camera.awb_gains = g
+rawCapture = PiRGBArray(camera)
+# Import map for unwrapping 360 image
 
-	rawCapture = PiRGBArray(camera)
 
-	# Import map for unwrapping 360 image
-	xmap = np.load('../../data/xmap.npy')
-	ymap = np.load('../../data/ymap.npy')
-
-	time.sleep(0.1)
+time.sleep(0.1)
 
 def get_img():
 	# Capture Image
