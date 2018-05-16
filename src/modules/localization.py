@@ -5,6 +5,7 @@ import math
 
 WIDTH = 20.0
 
+
 def map_encoder(state):
 
 	# Get l and r velocities
@@ -18,13 +19,40 @@ def map_encoder(state):
 	V = (Vr+Vl)/2
 
 	# Create new pose value
-	new_pose = Pose(0,0,0)
+	vel = Pose(0,0,0)
 
 	# Calculate new positions
-	new_pose.theta = omega*state.Time + state.Pose.theta
-	new_pose.x = V*math.cos(new_pose.theta)*state.Time + state.Pose.x
-	new_pose.y = V*math.sin(new_pose.theta)*state.Time + state.Pose.y
+	vel.theta = omega
+	vel.x = V*math.cos(vel.theta)
+	vel.y = V*math.sin(vel.theta)
 
 	# Update State
-	state.Pose = new_pose
+	#state.Pose = vel
+	return vel 
 
+def map_IMU_data(state):
+	# Calculate new pose from imu data
+	state.IMU.x_accelorimiter
+
+	#intergrate once for velocity acording to imu
+	vel = Pose(0,0,0)
+
+	return vel
+
+def get_desired_vel(state):
+	Vr =state.RightMotorSpeed
+
+	return vel
+
+def localize(state):
+	encoder_vel = map_encoder(state)
+	IMU_vel = map_IMU_data(state)
+	desired_vel = get_desired_vel(state)
+	
+	# Combine all 3 
+
+
+	# Multiply velocity by time and add previous pose 
+
+
+	state.Pose = final_pose 
