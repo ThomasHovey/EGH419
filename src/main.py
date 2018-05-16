@@ -14,7 +14,7 @@ def setup():
 	place_recog.setup()
 
 while (1):
-	img = get_img()
+	img = place_recog.get_img()
 	cv2.imshow('ShowImg',img)
 	cv2.waitKey(0)
 	rawCapture.truncate(0) 

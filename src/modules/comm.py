@@ -1,5 +1,6 @@
 import serial
 import time
+import classes.State 
 
 print('Python version:',serial.__version__)
 
@@ -17,3 +18,21 @@ while True:
         print(read_serial)
     end_time = time.time()
     print("Total time taken this loop: {0:.3f}s.".format(end_time - start_time))
+
+def readSerial(State.state):
+    # Ask for info 
+
+    # Wait for info
+
+    state.LeftEncoder = 
+
+
+
+
+    return state
+
+
+def writeSerial(State.state):
+
+    #Write updated motor speeds
+    
