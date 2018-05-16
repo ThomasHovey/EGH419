@@ -1,11 +1,49 @@
 import cv2
 import numpy as np
-import class_info
+from picamera.array import PiRGBArray
+from picamera import PiCamera 
+import time
+from classes.Pose import Pose
+from classes.ImageData import ImageData
 
 
 # Tuning Constants
 POSE_TOLERANCE = 10
 
+
+def setup():
+	# Setup PiCamera
+	camera = PiCamera()
+	camera.resolution = (1296,972)
+	camera.framerate = 30
+	#Wait
+	time.sleep(1.0)
+	camera.shutter_speed = camera.exposure_speed
+	camera.exposure_mode = 'off'
+	g = camera.awb_gains
+	camera.awb_mode = 'off'
+	camera.awb_gains = g
+
+	rawCapture = PiRGBArray(camera)
+
+	# Import map for unwrapping 360 image
+	xmap = np.load('../../data/xmap.npy')
+	ymap = np.load('../../data/ymap.npy')
+
+	time.sleep(0.1)
+
+def get_img():
+	# Capture Image
+	camera.capture(rawCapture, format='rgb')
+	# Convert to CV2 img
+	img = rawCapture.array
+	# Convert to grayscale
+	img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+	#Dewarp
+	output = cv2.remap(img_gray,xmap,ymap,cv2.INTER_LINEAR)
+
+	# Resize TODO
+	return output
 
 # Captures a single image from the camera and returns it in PIL format
 def get_image():
@@ -54,24 +92,24 @@ def build_database():
 		database.append(class_info.ImageData(capture,pose))
 		cv2.imwrite('img.png',capture)
 
-# Build database
-database = build_database()
+# # Build database
+# database = build_database()
 
-# Setup current location
-pose_current = class_info.Pose(1.5,0,0)
+# # Setup current location
+# pose_current = class_info.Pose(1.5,0,0)
 
-while 1:
-	# When ready capture an image
-	# key = raw_input("Enter any key to check (e or E to exit)")
-	# if key == 'E' or key == 'e':
-	# 	break
-	capture = get_image()
+# while 1:
+# 	# When ready capture an image
+# 	# key = raw_input("Enter any key to check (e or E to exit)")
+# 	# if key == 'E' or key == 'e':
+# 	# 	break
+# 	capture = get_image()
 
-	# Image search for closest image
-	new_pose, error = find_location(capture, database, pose_current)
+# 	# Image search for closest image
+# 	new_pose, error = find_location(capture, database, pose_current)
 
-	# Print answer
-	print("Pos : " + str(new_pose.x) + " Error : " + str(error))
+# 	# Print answer
+# 	print("Pos : " + str(new_pose.x) + " Error : " + str(error))
 
 # Close camera
 	
