@@ -105,10 +105,12 @@ class comm:
         # Spilt data base on command
         if cmd=="ECD:":
             L_Encoder,R_Encoder = dataRecvd.split(" ")
+			print("L_Encoder: " + L_Encoder + ",R_Encoder: " + R_Encoder)
             State.LeftDistance = L_Encoder/5.456 # in mm, 5.456 is counts/mm constance
             State.RightDistance = R_Encoder/5.456 # in mm, 5.456 is counts/mm constance
         elif cmd=="IMU:":
             Ax,Ay,Az,Gx,Gy,Gz = dataRecvd.split(" ")
+			print("Ax: " + Ax + ", Ay: " + Ay + ", Az: " + Az + ", Gx: " + Gx + ", Gy: " + Gy + ", Gz: " + Gz)
             State.Acc_x = Ax*0.061/1000 # in g, 0.061 is scale factor
             State.Acc_y = Ay*0.061/1000 # in g, 0.061 is scale factor
             State.Acc_z = Az*0.061/1000 # in g, 0.061 is scale factor
@@ -117,6 +119,7 @@ class comm:
             State.Gyr_z = Gz*4.375/1000 # in dps, 4.375 is scale factor
         elif cmd=="MAG:":
             Mx,My,Mz = dataRecvd.split(" ")
+			print("Mx: " + Mx + ", My: " + My + ", Mz: " + Mz)
             State.Mag_x = Mx/6842 # in gauss, 6842 is scale factor
             State.Mag_y = My/6842 # in gauss, 6842 is scale factor
             State.Mag_z = Mz/6842 # in gauss, 6842 is scale factor
