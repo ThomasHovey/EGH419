@@ -3,26 +3,26 @@ import time
 from classes.State import State
 from classes.Pose import Pose
 import comm
-import matplotlib.pyplot as plt
 
-state.LeftMotorSpeed = 140
-state.RightMotorSpeed = -140
+State.LeftMotorSpeed = 140
+State.RightMotorSpeed = -140
 
 READ_ENCODERS = "<ECD:>"
 READ_IMU = "<IMU:>"
 READ_COMPASS = "<MAG:>"
 READ_ALL = "<ALL:>"
-SENT_SPEED = "<MoSp:" + str(state.LeftMotorSpeed) + "," + str(state.RightMotorSpeed) + ">"
+SENT_SPEED = "<MoSp:" + str(State.LeftMotorSpeed) + "," + str(State.RightMotorSpeed) + ">"
 
 # Setup serial 
 comm.Serial_init()
+print("Complete initialise Serial.")
 
 # Create a new 
 state = State()
 time.sleep(2)
 
 # Update encoders
-comm.SerialSendCommand(state,READ_ENCODERS)
+comm.SerialSendCommand(state,"<ECD:>")
 time.sleep(5)
 
 # Update IMU
