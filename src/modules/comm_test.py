@@ -1,42 +1,54 @@
 import numpy as np
 import time
+from classes.IMU import IMU
 from classes.State import State
 from classes.Pose import Pose
 import comm
 
-State.LeftMotorSpeed = 140
-State.RightMotorSpeed = -140
-
-READ_ENCODERS = "<ECD:>"
-READ_IMU = "<IMU:>"
-READ_COMPASS = "<MAG:>"
-READ_ALL = "<ALL:>"
-SENT_SPEED = "<MoSp:" + str(State.LeftMotorSpeed) + "," + str(State.RightMotorSpeed) + ">"
 
 # Setup serial 
 comm.Serial_init()
-print("Complete initialise Serial.")
+print
 
 # Create a new 
 state = State()
+##imu = IMU()
 time.sleep(2)
 
 # Update encoders
-comm.SerialSendCommand(state,"<ECD:>")
-time.sleep(5)
+comm.updateData(state)
+print
+print("New data received as below:")
+print("L_Encoder: " + str(state.LeftDistance) + \
+      ", R_Encoder: " + str(state.RightDistance))
 
-# Update IMU
-comm.SerialSendCommand(state,READ_IMU)
-time.sleep(5)
+print("Ax: " + str(state.IMU.x_accel) + ", Ay: " + str(state.IMU.y_accel) + \
+      ", Az: " + str(state.IMU.z_accel) + ", Gx: " + str(state.IMU.x_gyro) + \
+      ", Gy: " + str(state.IMU.y_gyro) + ", Gz: " + str(state.IMU.z_gyro))
 
-# Update Compass
-comm.SerialSendCommand(state,READ_COMPASS)
-time.sleep(5)
-
-# Update all encoders, IMU, Compass
-comm.SerialSendCommand(state,READ_ALL)
-time.sleep(5)
+print("Mx: " + str(state.Compass.x_mag) + \
+      ", My: " + str(state.Compass.y_mag) + \
+      ", Mz: " + str(state.Compass.z_mag))
+print
+time.sleep(2)
 
 # Update motorspeed
-comm.SerialSendCommand(state,SENT_SPEED)
-time.sleep(5)
+state.LeftMotorSpeed = 120.3
+state.RightMotorSpeed = -140
+comm.setMotorSpeed(state)
+print
+time.sleep(2)
+
+# Update motorspeed
+state.LeftMotorSpeed = 150
+state.RightMotorSpeed = -140
+comm.setMotorSpeed(state)
+print
+time.sleep(2)
+
+# Update motorspeed
+state.LeftMotorSpeed = 0
+state.RightMotorSpeed = 0
+comm.setMotorSpeed(state)
+print
+time.sleep(2)

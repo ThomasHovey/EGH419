@@ -121,8 +121,6 @@ bool CS_calc_done = false;
 /*----------------------------------------------------------------------------------------------------------------------------*/
 void setup() {
   Serial.begin (9600);
-  SerialReply2Pi("<\t\tLow level communication>");
-  SerialReply2Pi("< -------------------------------------------------------------->");
   //Set pins as inputs for encoders
   pinMode(L_encoderPinA, INPUT);
   pinMode(L_encoderPinB, INPUT);
@@ -161,17 +159,6 @@ void setup() {
     mag.enableDefault();
     SerialReply2Pi("<Magnetometer detected and initialized!>");
   }
-  // Ready
-  SerialReply2Pi("< --------------------------------------------------------------->");
-  SerialReply2Pi("<| Sent 'MoSp:L_speed,R_speed'   Move in constant speed (mm/s).  |>");
-  //  SerialReply2Pi("<| Sent 'MoDt:Distance'          Move for specific distance (mm).|>");
-  SerialReply2Pi("<| Sent 'St:'                    For emergence stop.             |>");
-  SerialReply2Pi("<| Sent 'ECD:'                   Read encoder diff since last.   |>");
-  SerialReply2Pi("<| Sent 'IMU:'                   Read IMU data.                  |>");
-  SerialReply2Pi("<| Sent 'MAG:'                   Read compass data.              |>");
-  SerialReply2Pi("< --------------------------------------------------------------->");
-  SerialReply2Pi("<|                Low level communication start!!                |>");
-  SerialReply2Pi("< --------------------------------------------------------------->");
   delay(2000);
   SerialReply2Pi("<Arduino is ready>");
 }
@@ -202,57 +189,65 @@ void loop()
 /*----------------------------------------------------------------------------------------------------------------------------*/
 void Communication_Handler() {
   // Split the command in two values
-//  SerialReply2Pi("<Arduino received data: >");
-//  Serial.println(inputString);
-  char message1[80];
-      snprintf(message1, sizeof(message1), "<Arduino CS error: %d>", (int)in_checksum_value - (int)in_sum_value%128);
-      SerialReply2Pi(message1);
+  //  SerialReply2Pi("<Arduino received data: >");
+  //  Serial.println(inputString);
+  //  char message1[80];
+  //      snprintf(message1, sizeof(message1), "<Arduino CS error: %d>", (int)in_checksum_value - (int)in_sum_value%128);
+  //      SerialReply2Pi(message1);
   String command = getValue(inputString, ':', 0);
   // Do something with data
   if (command != 0)
   {
-//    SerialReply2Pi("<Arduino received command: >");
-//    Serial.println(command);
-    if (command == "St") // Emergency Stop
+    //    SerialReply2Pi("<Arduino received command: >");
+    //    Serial.println(command);
+    //    if (command == "St") // Emergency Stop
+    //    {
+    //      SerialReply2Pi("<Emergency Stop!!!>");
+    //      L_required_speed = 0;
+    //      R_required_speed = 0;
+    //      motor_mode = 0;
+    //    }
+    if (command == "MoSp")
     {
-      SerialReply2Pi("<Emergency Stop!!!>");
-      L_required_speed = 0;
-      R_required_speed = 0;
-      motor_mode = 0;
-    }
-    else if (command == "MoSp")
-    {
-      String values = getValue(inputString, ':', 1);
-      String L_speed = getValue(values, ',', 0);
-      String R_speed = getValue(values, ',', 1);
-//      SerialReply2Pi("<Speed values: >");
-//      Serial.print(values);
-//      SerialReply2Pi("<Left Speed: >");
-//      Serial.print(L_speed);
-//      SerialReply2Pi("<Right Speed: >");
-//      Serial.print(R_speed);
-      if ((L_speed.toInt() == 0) && (R_speed.toInt() == 0))
+      if (((int)in_checksum_value - (int)in_sum_value % 128) != 0)
       {
-        SerialReply2Pi("<Motor Stopped.>");
-        L_required_speed = 0;
-        R_required_speed = 0;
-        motor_mode = 0;
-      }
-      else if ((abs(L_speed.toInt()) <= 140) && (abs(R_speed.toInt()) <= 140))
-      {
-        L_required_speed = L_speed.toInt();
-        R_required_speed = R_speed.toInt();
-        motor_mode = 1;
-        //          SerialReply2Pi("<Motor is turning at: Left Speed: >");
-        //          Serial.print(L_required_speed);
-        //          SerialReply2Pi("< mm/s, Right Speed: >");
-        //          Serial.print(R_required_speed);
-        //          SerialReply2Pi("< mm/s.>");
+        SerialReply2Pi("<Er>");
       }
       else
       {
-        SerialReply2Pi("<Max speed is 140 mm/s! Please consider lower the speed.>");
+        String values = getValue(inputString, ':', 1);
+        String L_speed = getValue(values, ',', 0);
+        String R_speed = getValue(values, ',', 1);
+        //      SerialReply2Pi("<Speed values: >");
+        //      Serial.print(values);
+        //      SerialReply2Pi("<Left Speed: >");
+        //      Serial.print(L_speed);
+        //      SerialReply2Pi("<Right Speed: >");
+        //      Serial.print(R_speed);
+        if ((L_speed.toInt() == 0) && (R_speed.toInt() == 0))
+        {
+          SerialReply2Pi("<Motor Stopped.>");
+          L_required_speed = 0;
+          R_required_speed = 0;
+          motor_mode = 0;
+        }
+        else if ((abs(L_speed.toInt()) <= 140) && (abs(R_speed.toInt()) <= 140))
+        {
+          L_required_speed = L_speed.toInt();
+          R_required_speed = R_speed.toInt();
+          motor_mode = 1;
+          //          SerialReply2Pi("<Motor is turning at: Left Speed: >");
+          //          Serial.print(L_required_speed);
+          //          SerialReply2Pi("< mm/s, Right Speed: >");
+          //          Serial.print(R_required_speed);
+          //          SerialReply2Pi("< mm/s.>");
+          SerialReply2Pi("<Speed set done.>");
+        }
       }
+      //      else
+      //      {
+      //        SerialReply2Pi("<Max speed is 140 mm/s! Please consider lower the speed.>");
+      //      }
     }
     //    else if (command == "MoDt")
     //    {
@@ -321,7 +316,7 @@ void Communication_Handler() {
   }
   else
   {
-    SerialReply2Pi("<Arduino received invalid command! Please make sure your command in this format: command:value>");
+    SerialReply2Pi("<Arduino received invalid command!>");
   }
   // clear the string:
   inputString = "";
@@ -537,16 +532,16 @@ void R_Encoder_Int() {
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------*/
-void SerialReply2Pi(String mesg){
-  for(int i = 0; i < mesg.length(); i++)
+void SerialReply2Pi(String mesg) {
+  for (int i = 0; i < mesg.length(); i++)
   {
     char x = mesg[i];
-    
+
     // Check if that byte is the end of command
     if (x == endMarker)
     {
-        readInProgress = false;
-        CS_calc_done = true;
+      readInProgress = false;
+      CS_calc_done = true;
     }
     // Check if currently reading data
     if (readInProgress) {
@@ -561,11 +556,11 @@ void SerialReply2Pi(String mesg){
       outputString = "";
       CS_calc_done = false;
     }
-    
+
     if (CS_calc_done)
     {
-      char checksum_c = out_sum_value%128;
-      mesg = mesg+checksum_c;
+      char checksum_c = out_sum_value % 128;
+      mesg = mesg + checksum_c;
       Serial.println(mesg);
       CS_calc_done = false;
       break;
