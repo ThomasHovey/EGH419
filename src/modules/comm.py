@@ -1,6 +1,8 @@
 import serial
 import time
 from classes.State import State
+from classes.IMU import IMU
+from classes.Compass import Compass
 
 ##print('Python version:',serial.__version__)
 
@@ -65,7 +67,7 @@ class comm:
                 return(message,checksum_result)
             if ord(x) == endMarker: # if x is a endMarker, move to read check sum
                 readCheckSum = 1
-            else # x is not a endMarker, keep saving data
+            else: # x is not a endMarker, keep saving data
                 message = message + x
                 message_sum = message_sum + ord(x)
                     
@@ -105,24 +107,26 @@ class comm:
         # Spilt data base on command
         if cmd=="<ECD:>":
             L_Encoder,R_Encoder = dataRecvd.split(" ")
-			print("L_Encoder: " + L_Encoder + ",R_Encoder: " + R_Encoder)
+            print("L_Encoder: " + L_Encoder + ",R_Encoder: " + R_Encoder)
             State.LeftDistance = L_Encoder/5.456 # in mm, 5.456 is counts/mm constance
             State.RightDistance = R_Encoder/5.456 # in mm, 5.456 is counts/mm constance
         elif cmd=="<IMU:>":
             Ax,Ay,Az,Gx,Gy,Gz = dataRecvd.split(" ")
-			print("Ax: " + Ax + ", Ay: " + Ay + ", Az: " + Az + ", Gx: " + Gx + ", Gy: " + Gy + ", Gz: " + Gz)
-            State.Acc_x = Ax*0.061/1000 # in g, 0.061 is scale factor
-            State.Acc_y = Ay*0.061/1000 # in g, 0.061 is scale factor
-            State.Acc_z = Az*0.061/1000 # in g, 0.061 is scale factor
-            State.Gyr_x = Gx*4.375/1000 # in dps, 4.375 is scale factor
-            State.Gyr_y = Gy*4.375/1000 # in dps, 4.375 is scale factor
-            State.Gyr_z = Gz*4.375/1000 # in dps, 4.375 is scale factor
+            print("Ax: " + Ax + ", Ay: " + Ay + ", Az: " + Az + ", Gx: " + Gx + ", Gy: " + Gy + ", Gz: " + Gz)
+            Acc_x = Ax*0.061/1000 # in g, 0.061 is scale factor
+            Acc_y = Ay*0.061/1000 # in g, 0.061 is scale factor
+            Acc_z = Az*0.061/1000 # in g, 0.061 is scale factor
+            Gyr_x = Gx*4.375/1000 # in dps, 4.375 is scale factor
+            Gyr_y = Gy*4.375/1000 # in dps, 4.375 is scale factor
+            Gyr_z = Gz*4.375/1000 # in dps, 4.375 is scale factor
+            State.IMU = IMU(Acc_x,Acc_y,Acc_z,Gyr_x,Gyr_y,Gyr_z)
         elif cmd=="<MAG:>":
             Mx,My,Mz = dataRecvd.split(" ")
-			print("Mx: " + Mx + ", My: " + My + ", Mz: " + Mz)
-            State.Mag_x = Mx/6842 # in gauss, 6842 is scale factor
-            State.Mag_y = My/6842 # in gauss, 6842 is scale factor
-            State.Mag_z = Mz/6842 # in gauss, 6842 is scale factor
+            print("Mx: " + Mx + ", My: " + My + ", Mz: " + Mz)
+            Mag_x = Mx/6842 # in gauss, 6842 is scale factor
+            Mag_y = My/6842 # in gauss, 6842 is scale factor
+            Mag_z = Mz/6842 # in gauss, 6842 is scale factor
+            State.Compass = Compass(Mag_x,Mag_y,Mag_z)
         else:
             pass
         return State
