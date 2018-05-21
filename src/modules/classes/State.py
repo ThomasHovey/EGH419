@@ -1,4 +1,6 @@
 from Pose import Pose
+from IMU import IMU
+
 class State:
 
 	def __init__(self, ):
@@ -6,7 +8,6 @@ class State:
 		self.RightMotorSpeed = 0
 		self.LeftDistance = 0
 		self.RightDistance = 0
-		self.IMU = []
-		self.Compass = []
-		self.Pose = Pose(0,0,0)
-		self.Time = 0.0
+		self.IMU = IMU(0,0,0,0)
+		self.Pose = Pose(0,0,0,0,0,0)
+		self.Time = 0
