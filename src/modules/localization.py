@@ -61,8 +61,8 @@ def get_desired_vel(state):
 
 	# Calculate new positions
 	pose.omega = omega
-	pose.x_vel = V*math.cos(pose.theta + omega*state.Time)
-	pose.y_vel = V*math.sin(pose.theta + omega*state.Time)
+	pose.x_vel = V*math.cos(state.Pose.theta + omega*state.Time)
+	pose.y_vel = V*math.sin(state.Pose.theta + omega*state.Time)
 	
 	return pose
 	
