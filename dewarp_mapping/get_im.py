@@ -6,7 +6,7 @@ import time
 
 # Setup camera
 camera = PiCamera()
-camera.resolution = (1296,972)
+camera.resolution = (1312,972)
 camera.framerate = 30
 #Wait
 time.sleep(1.0)
@@ -20,6 +20,6 @@ rawCapture = PiRGBArray(camera)
 
 time.sleep(0.1)
 
-img = camera.capture(rawCapture, format='rgb')
-cv2.imwrite('img.png', img)
+camera.capture(rawCapture, format='rgb')
+cv2.imwrite('img.png', rawCapture)
 
