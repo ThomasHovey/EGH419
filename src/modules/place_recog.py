@@ -24,7 +24,8 @@ camera.awb_gains = g
 
 rawCapture = PiRGBArray(camera)
 # Import map for unwrapping 360 image
-
+xmap = np.load('data/xmap.npy')
+ymap = np.load('data/ymap.npy')
 
 time.sleep(0.1)
 
@@ -82,11 +83,18 @@ def build_database():
 	while 1:
 		key = raw_input("Enter pose x value (press e to finish)")
 		if key == 'E' or key == 'e':
+			np.save('data/database.npy',np.asarray(database))
 			return database
 		pose = class_info.Pose(int(key),0,0)
 		capture = get_image()
 		database.append(class_info.ImageData(capture,pose))
 		cv2.imwrite('img.png',capture)
+
+def load_database():
+	database = np.load('data/database.npy')
+	database.toList()
+	return database
+
 
 # # Build database
 # database = build_database()
