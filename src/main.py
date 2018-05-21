@@ -6,11 +6,9 @@ import time
 import modules.place_recog as place_recog
 from modules.classes.Pose import Pose
 from modules.classes.ImageData import ImageData
-import modules.comm
-import modules.localization
+import modules.comm as comm
+import modules.localization as localization
 
-xmap = np.load('modules/data/xmap.npy')
-ymap = np.load('modules/data/ymap.npy')
 
 time.sleep(0.1)
 
@@ -26,6 +24,8 @@ while (1):
 	cv2.imshow('ShowImg',img)
 	cv2.waitKey(0)
 	rawCapture.truncate(0) 
+
+
 
 
 

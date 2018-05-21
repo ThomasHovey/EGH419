@@ -1,6 +1,6 @@
 class IMU:
 
-	def __init__(self,x_accel,y_accel,z_accel,x_gyro,y_gyro,z_gyro,compass):
+	def __init__(self,x_accel,y_accel,z_accel,x_gyro,y_gyro,z_gyro):
 		self.x_accel = x_accel
 		self.y_accel = y_accel
 		self.z_accel = z_accel
