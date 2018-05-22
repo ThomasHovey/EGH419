@@ -23,9 +23,10 @@ camera.awb_mode = 'off'
 camera.awb_gains = g
 
 rawCapture = PiRGBArray(camera)
+
 # Import map for unwrapping 360 image
-xmap = np.load('data/xmap.npy')
-ymap = np.load('data/ymap.npy')
+xmap = np.load("xmap.npy")
+ymap = np.load("ymap.npy")
 
 time.sleep(0.1)
 
