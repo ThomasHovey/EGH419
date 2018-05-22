@@ -95,8 +95,8 @@ print "BUILDING MAP!"
 #print "HD value" + str(Hd)
 #print "WD value" + str(Wd)
 xmap,ymap = buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy)
-np.save('xmap.npy',xmap)
-np.save('ymap.npy',ymap)
+np.save('../src/modules/data/xmap.npy',xmap)
+np.save('../src/modules/data/ymap.npy',ymap)
 
 print "MAP DONE!"
 

@@ -84,7 +84,7 @@ def build_database():
 	while 1:
 		key = raw_input("Enter pose x value (press e to finish)")
 		if key == 'E' or key == 'e':
-			np.save('data/database.npy',np.asarray(database))
+			np.save('modules/data/database.npy',np.asarray(database))
 			return database
 		pose = class_info.Pose(int(key),0,0)
 		capture = get_image()
@@ -92,7 +92,7 @@ def build_database():
 		cv2.imwrite('img.png',capture)
 
 def load_database():
-	database = np.load('data/database.npy')
+	database = np.load('modules/data/database.npy')
 	database.toList()
 	return database
 
