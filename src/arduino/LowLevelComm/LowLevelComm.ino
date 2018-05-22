@@ -177,9 +177,6 @@ void loop()
     case 1:
       Constant_speed_mode();
       break;
-    //    case 2:
-    //      Move_distance_mode();
-    //      break;
     default:
       // statements
       break;
@@ -189,91 +186,34 @@ void loop()
 /*----------------------------------------------------------------------------------------------------------------------------*/
 void Communication_Handler() {
   // Split the command in two values
-  //  SerialReply2Pi("<Arduino received data: >");
-  //  Serial.println(inputString);
-  //  char message1[80];
-  //      snprintf(message1, sizeof(message1), "<Arduino CS error: %d>", (int)in_checksum_value - (int)in_sum_value%128);
-  //      SerialReply2Pi(message1);
   String command = getValue(inputString, ':', 0);
   // Do something with data
-  if (command != 0)
+  if (((int)in_checksum_value - (int)in_sum_value % 128) != 0)
   {
-    //    SerialReply2Pi("<Arduino received command: >");
-    //    Serial.println(command);
-    //    if (command == "St") // Emergency Stop
-    //    {
-    //      SerialReply2Pi("<Emergency Stop!!!>");
-    //      L_required_speed = 0;
-    //      R_required_speed = 0;
-    //      motor_mode = 0;
-    //    }
+    SerialReply2Pi("<Er>");
+  }
+  else if (command != 0)
+  {
     if (command == "MoSp")
     {
-      if (((int)in_checksum_value - (int)in_sum_value % 128) != 0)
+      String values = getValue(inputString, ':', 1);
+      String L_speed = getValue(values, ',', 0);
+      String R_speed = getValue(values, ',', 1);
+      if ((L_speed.toInt() == 0) && (R_speed.toInt() == 0))
       {
-        SerialReply2Pi("<Er>");
+        SerialReply2Pi("<Motor Stopped.>");
+        L_required_speed = 0;
+        R_required_speed = 0;
+        motor_mode = 0;
       }
-      else
+      else if ((abs(L_speed.toInt()) <= 140) && (abs(R_speed.toInt()) <= 140))
       {
-        String values = getValue(inputString, ':', 1);
-        String L_speed = getValue(values, ',', 0);
-        String R_speed = getValue(values, ',', 1);
-        //      SerialReply2Pi("<Speed values: >");
-        //      Serial.print(values);
-        //      SerialReply2Pi("<Left Speed: >");
-        //      Serial.print(L_speed);
-        //      SerialReply2Pi("<Right Speed: >");
-        //      Serial.print(R_speed);
-        if ((L_speed.toInt() == 0) && (R_speed.toInt() == 0))
-        {
-          SerialReply2Pi("<Motor Stopped.>");
-          L_required_speed = 0;
-          R_required_speed = 0;
-          motor_mode = 0;
-        }
-        else if ((abs(L_speed.toInt()) <= 140) && (abs(R_speed.toInt()) <= 140))
-        {
-          L_required_speed = L_speed.toInt();
-          R_required_speed = R_speed.toInt();
-          motor_mode = 1;
-          //          SerialReply2Pi("<Motor is turning at: Left Speed: >");
-          //          Serial.print(L_required_speed);
-          //          SerialReply2Pi("< mm/s, Right Speed: >");
-          //          Serial.print(R_required_speed);
-          //          SerialReply2Pi("< mm/s.>");
-          SerialReply2Pi("<Speed set done.>");
-        }
+        L_required_speed = L_speed.toInt();
+        R_required_speed = R_speed.toInt();
+        motor_mode = 1;
+        SerialReply2Pi("<Speed set done.>");
       }
-      //      else
-      //      {
-      //        SerialReply2Pi("<Max speed is 140 mm/s! Please consider lower the speed.>");
-      //      }
     }
-    //    else if (command == "MoDt")
-    //    {
-    //      String distance = getValue(inputString, ':', 1);
-    //      //        SerialReply2Pi("<Distance values: >");
-    //      //        Serial.print(values);
-    //      int distance_int = distance.toInt();
-    //      if (distance_int == 0)
-    //      {
-    //        SerialReply2Pi("<Motor Stopped.");
-    //        L_required_speed = 0;
-    //        R_required_speed = 0;
-    //        motor_mode = 0;
-    //      }
-    //      else
-    //      {
-    //        required_distance = distance_int;
-    //        L_LastCnts = L_encoderCnts;
-    //        R_LastCnts = R_encoderCnts;
-    //        motor_mode = 2;
-    //        speed_is_set = 0;
-    //        SerialReply2Pi("<Robot moves for: >");
-    //        Serial.print(distance_int);
-    //        SerialReply2Pi("< mm.>");
-    //      }
-    //    }
     else if (command == "ECD")
     {
       char message[80];
@@ -339,22 +279,10 @@ void Constant_speed_mode() {
   float R_required_rpm = (R_required_speed / 1000.0) / ((Wheel_R / 1000.0) * 0.10472) * Gear_ratio; // v = r × RPM × 0.10472
   float L_required_Fre = (abs(L_required_rpm) * counts_per_revolution * 1.0) / (60 * (1000.0 / PID_loop_time)); //L_required_Fre = counts/loop
   float R_required_Fre = (abs(R_required_rpm) * counts_per_revolution * 1.0) / (60 * (1000.0 / PID_loop_time)); //R_required_Fre = counts/loop
-  //    SerialReply2Pi("<L_required_rpm: >");
-  //    Serial.print(L_required_rpm);
-  //    SerialReply2Pi("<\tR_required_rpm: >");
-  //    Serial.println(R_required_rpm);
-  //    SerialReply2Pi("<L_required_Fre: >");
-  //    Serial.print(L_required_Fre);
-  //    SerialReply2Pi("<\tR_required_Fre: >");
-  //    Serial.println(R_required_Fre);
   if (millis() - lastmillis >= PID_loop_time)
   {
     // PID control for left wheel
     float error = L_required_Fre - abs(L_encoderCnts); //P control
-    //    SerialReply2Pi("<L_error: >");
-    //    Serial.println(error);
-    //        SerialReply2Pi("<\tL_encoder: >");
-    //        Serial.print(L_encoderCnts);
     if (abs(error) > 0.5)
     {
       L_derivative = error - L_last_error;// D control
@@ -382,8 +310,6 @@ void Constant_speed_mode() {
       {
         L_M_speed = New_speed;
       }
-      //          SerialReply2Pi("<\tL_M_speed: >");
-      //          Serial.println(L_M_speed);
       if (L_required_speed > 0)
       {
         analogWrite(LmotorFW, L_M_speed);
@@ -403,10 +329,6 @@ void Constant_speed_mode() {
     }
     // PID control for right wheel
     error = R_required_Fre - abs(R_encoderCnts); //P control
-    //    SerialReply2Pi("<R_error: >");
-    //    Serial.println(error);
-    //        SerialReply2Pi("<\tR_encoder: >");
-    //        Serial.print(R_encoderCnts);
     if (abs(error) > 0.5)
     {
       R_derivative = error - R_last_error;// D control
@@ -434,8 +356,6 @@ void Constant_speed_mode() {
       {
         R_M_speed = New_speed;
       }
-      //          SerialReply2Pi("<\tR_M_speed: >");
-      //          Serial.println(R_M_speed);
       if (R_required_speed > 0)
       {
         analogWrite(RmotorFW, R_M_speed);
@@ -459,43 +379,6 @@ void Constant_speed_mode() {
     lastmillis = millis(); // Uptade lasmillis
   }
 }
-
-/*----------------------------------------------------------------------------------------------------------------------------*/
-//void Move_distance_mode() {
-//  float required_Fre = abs(required_distance) * counts_per_mm;
-//  int current_counts = abs(((L_encoderCnts - L_LastCnts) + (R_encoderCnts - R_LastCnts)) / 2);
-//  //  SerialReply2Pi("<Robot move for: >");
-//  //  Serial.print(required_Fre);
-//  //  SerialReply2Pi("< counts, current counts: >");
-//  //  Serial.println(current_counts);
-//  if (current_counts < required_Fre)
-//  {
-//    if (!speed_is_set)
-//    {
-//      if (required_distance > 0)
-//      {
-//        analogWrite(LmotorFW, 120);
-//        analogWrite(LmotorBW, 0);
-//        analogWrite(RmotorFW, 120);
-//        analogWrite(RmotorBW, 0);
-//        speed_is_set = 1;
-//      }
-//      else
-//      {
-//        analogWrite(LmotorFW, 0);
-//        analogWrite(LmotorBW, 120);
-//        analogWrite(RmotorFW, 0);
-//        analogWrite(RmotorBW, 120);
-//        speed_is_set = 1;
-//      }
-//    }
-//  }
-//  else
-//  {
-//    speed_is_set = 0;
-//    motor_mode = 0;
-//  }
-//}
 
 /*----------------------------------------------------------------------------------------------------------------------------*/
 void L_Encoder_Int() {
