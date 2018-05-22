@@ -21,5 +21,5 @@ rawCapture = PiRGBArray(camera)
 time.sleep(0.1)
 
 camera.capture(rawCapture, format='rgb')
-cv2.imwrite('img.png', rawCapture)
+cv2.imwrite('img.png', rawCapture.array)
 

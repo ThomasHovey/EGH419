@@ -55,7 +55,7 @@ last = (0,0)
 # Sometimes there is crud at the begining, buffer it out
 #for i in range(0,10):
  #   img = vc.getImage()
-img = Image("data/img.jpg")
+img = Image("img.png")
 img.save(disp)
 # Show the user a frame let them left click the center
 # of the "donut" and the right inner and outer edge
@@ -95,8 +95,8 @@ print "BUILDING MAP!"
 #print "HD value" + str(Hd)
 #print "WD value" + str(Wd)
 xmap,ymap = buildMap(Ws,Hs,Wd,Hd,R1,R2,Cx,Cy)
-np.save('data/xmap.npy',xmap)
-np.save('data/ymap.npy',ymap)
+np.save('xmap.npy',xmap)
+np.save('ymap.npy',ymap)
 
 print "MAP DONE!"
 
@@ -104,7 +104,7 @@ print "MAP DONE!"
 result = unwarp(img,xmap,ymap)
 #result = result.adaptiveScale(resolution=(640,480))
 #result = result.adaptiveScale(resolution=(1024,768))
-result.save("data/pi_unwarped.png")
+result.save("pi_unwarped.png")
 
 
 
