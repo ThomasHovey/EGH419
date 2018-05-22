@@ -13,7 +13,7 @@ time.sleep(0.1)
 
 state.LeftMotorSpeed = 50
 state.RightMotorSpeed = 70
-
+comm.Serial_init()
 # Setup plot
 plt.ion()
 fig = plt.figure()
@@ -25,11 +25,11 @@ plt.xlim(-50,50)
 i=0
 while i < 10:
 	# Update motor speeds
-	comm.sendMotorSpeeds(state)
+	comm.setMotorSpeed(state)
 
 	time.sleep(0.2)
 	# Read encoder data ect
-	comm.update(state)
+	comm.updateData(state)
 	localization.update(state)
 	# plot new position
 	line1.set_xdata(state.Pose.x)
