@@ -25,8 +25,8 @@ camera.awb_gains = g
 rawCapture = PiRGBArray(camera)
 
 # Import map for unwrapping 360 image
-xmap = np.load("xmap.npy")
-ymap = np.load("ymap.npy")
+xmap = np.load("modules/data/xmap.npy")
+ymap = np.load("modules/data/ymap.npy")
 
 time.sleep(0.1)
 
@@ -39,7 +39,7 @@ def get_img():
 	img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	#Dewarp
 	output = cv2.remap(img_gray,xmap,ymap,cv2.INTER_LINEAR)
-
+        rawCapture.truncate(0) 
 	# Resize TODO
 	return output
 
