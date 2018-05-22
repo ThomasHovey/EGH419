@@ -6,10 +6,14 @@ import time
 import modules.place_recog as place_recog
 from modules.classes.Pose import Pose
 from modules.classes.ImageData import ImageData
+from modules.classes.State import State
 import modules.comm as comm
 import modules.localization as localization
+import matplotlib.pyplot as plt
 
 time.sleep(0.1)
+
+state = State()
 
 state.LeftMotorSpeed = 50
 state.RightMotorSpeed = 70
@@ -23,7 +27,7 @@ plt.ylim(-50,50)
 plt.xlim(-50,50)
 
 i=0
-while i < 10:
+while i < 30:
 	# Update motor speeds
 	comm.setMotorSpeed(state)
 
