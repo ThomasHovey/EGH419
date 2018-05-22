@@ -18,6 +18,7 @@ state = State()
 state.LeftMotorSpeed = 50
 state.RightMotorSpeed = 70
 comm.Serial_init()
+
 # Setup plot
 plt.ion()
 fig = plt.figure()
@@ -44,5 +45,5 @@ while i < 30:
 
 state.LeftMotorSpeed = 0
 state.RightMotorSpeed = 0
-comm.sendMotorSpeeds(state)
+comm.setMotorSpeed(state)
 

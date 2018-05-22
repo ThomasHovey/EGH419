@@ -19,13 +19,10 @@ def sendToArduino(sendStr):
     for i in sendStr:
         if ord(i) != startMarker and ord(i) != endMarker:
             checksum = checksum + ord(i.encode())
-##            print("Sending " + i + " with ASCII value: " + str(ord(i.encode())) + " checksum: " + str(checksum%128))
     checksum = checksum % 128
-##    print("Sent data with CS value: " + str(checksum) + " which is: " + str(chr(checksum)))
     checksum_c = chr(checksum)
     sendStr = sendStr + checksum_c
     ArduinoSer.write(sendStr.encode())
-##    print("Checksum added to data: " + sendStr)
 
 def recvFromArduino():
     global startMarker, endMarker, ArduinoSer
@@ -71,7 +68,6 @@ def waitForArduino():
         while ArduinoSer.inWaiting() == 0:
             pass
         msg,cs_error = recvFromArduino()
-##        print(msg + ", Pi CS error: " + str(cs_error))
         print(msg)
         
 def updateData(State):
@@ -80,6 +76,9 @@ def updateData(State):
     cmdData.append("<ECD:>")
     cmdData.append("<MAG:>")
     n = 0
+    splitData_En = 0;
+    maxTrial = 5;
+    nTrial = 0;
     while n < len(cmdData):
         cmd = cmdData[n]
         waitingForReply = False
@@ -92,41 +91,66 @@ def updateData(State):
             while ArduinoSer.inWaiting() == 0:
                 pass    
             dataRecvd,checksum_error = recvFromArduino()
-##            print("Arduino replied: " + dataRecvd + ", Pi CS error: " + str(checksum_error))
+            # Checksum
+            if checksum_error != 0:
+                print("[ERROR] Pi CheckSum error, trying again...")
+                nTrial +=1
+                splitData_En = 0
+                waitingForReply = False
+                if nTrial>maxTrial:
+                    n = len(cmdData) + 1 # Do this to exit the loop
+                    print("[ERROR] Pi CheckSum error, runout of trials! Data update failed!")
+            elif dataRecvd == "Er": # Pi checksum pass but Arduino checksum is not correct
+                print("[ERROR] Arduino CheckSum error, trying again...")
+                nTrial +=1
+                splitData_En = 0
+                waitingForReply = False
+                if nTrial>maxTrial:
+                    n = len(cmdData) + 1 # Do this to exit the loop
+                    print("[ERROR] Arduino CheckSum error, runout of trials! Data update failed!")
+            else:
+                splitData_En = 1
             if ArduinoSer.inWaiting() < 10: 
                 ArduinoSer.flushInput()
                 waitingForReply = False
-    ##        if checksum_error!=0:
-    ##            print("Checksum error occured!")
-    ##            pass
-        # Spilt data base on command
-        if cmd=="<ECD:>":
-            L_Encoder,R_Encoder = dataRecvd.split(" ")
-            State.LeftDistance = float(L_Encoder)/5.456 # in mm, 5.456 is counts/mm constance
-            State.RightDistance = float(R_Encoder)/5.456 # in mm, 5.456 is counts/mm constance
-##            print("L_Encoder: " + str(State.LeftDistance) + \
-##                  ", R_Encoder: " + str(State.RightDistance))
-        elif cmd=="<IMU:>":
-            Ax,Ay,Az,Gx,Gy,Gz = dataRecvd.split(" ")
-            Acc_x = float(Ax)*0.061/1000 # in g, 0.061 is scale factor
-            Acc_y = float(Ay)*0.061/1000 # in g, 0.061 is scale factor
-            Acc_z = float(Az)*0.061/1000 # in g, 0.061 is scale factor
-            Gyr_x = float(Gx)*4.375/1000 # in dps, 4.375 is scale factor
-            Gyr_y = float(Gy)*4.375/1000 # in dps, 4.375 is scale factor
-            Gyr_z = float(Gz)*4.375/1000 # in dps, 4.375 is scale factor
-##            print("Ax: " + str(Acc_x) + ", Ay: " + str(Acc_y) + \
-##                  ", Az: " + str(Acc_z) + ", Gx: " + str(Gyr_x) + \
-##                  ", Gy: " + str(Gyr_y) + ", Gz: " + str(Gyr_z))
-            State.IMU = IMU(Acc_x,Acc_y,Acc_z,Gyr_x,Gyr_y,Gyr_z)
-        elif cmd=="<MAG:>":
-            Mx,My,Mz = dataRecvd.split(" ")
-            Mag_x = float(Mx)/6842 # in gauss, 6842 is scale factor
-            Mag_y = float(My)/6842 # in gauss, 6842 is scale factor
-            Mag_z = float(Mz)/6842 # in gauss, 6842 is scale factor           
-##            print("Mx: " + str(Mag_x) + ", My: " + str(Mag_y) + \
-##                  ", Mz: " + str(Mag_z))
-            State.Compass = Compass(Mag_x,Mag_y,Mag_z)
-        n += 1
+
+        if splitData_En:    
+            # Spilt data base on command
+            if cmd=="<ECD:>":
+                try:
+                    split_data = dataRecvd.split(" ")
+                    L_Encoder,R_Encoder = split_data
+                    State.LeftDistance = float(L_Encoder)/5.456 # in mm, 5.456 is counts/mm constance
+                    State.RightDistance = float(R_Encoder)/5.456 # in mm, 5.456 is counts/mm constance
+                except ValueError as error:
+                    print("[WARNING] Arduino returned invalid ECD data, state elements unchanged.")
+                    print("Data received: " + dataRecvd)
+            elif cmd=="<IMU:>":
+                try:
+                    split_data = dataRecvd.split(" ")
+                    Ax,Ay,Az,Gx,Gy,Gz = split_data
+                    Acc_x = float(Ax)*0.061/1000 # in g, 0.061 is scale factor
+                    Acc_y = float(Ay)*0.061/1000 # in g, 0.061 is scale factor
+                    Acc_z = float(Az)*0.061/1000 # in g, 0.061 is scale factor
+                    Gyr_x = float(Gx)*4.375/1000 # in dps, 4.375 is scale factor
+                    Gyr_y = float(Gy)*4.375/1000 # in dps, 4.375 is scale factor
+                    Gyr_z = float(Gz)*4.375/1000 # in dps, 4.375 is scale factor 
+                    State.IMU = IMU(Acc_x,Acc_y,Acc_z,Gyr_x,Gyr_y,Gyr_z)
+                except ValueError as error:
+                    print("[WARNING] Arduino returned invalid IMU data, state elements unchanged.")
+                    print("Data received: " + dataRecvd)
+            elif cmd=="<MAG:>":
+                try:
+                    split_data = dataRecvd.split(" ")
+                    Mx,My,Mz = split_data
+                    Mag_x = float(Mx)/6842 # in gauss, 6842 is scale factor
+                    Mag_y = float(My)/6842 # in gauss, 6842 is scale factor
+                    Mag_z = float(Mz)/6842 # in gauss, 6842 is scale factor  
+                    State.Compass = Compass(Mag_x,Mag_y,Mag_z)
+                except ValueError as error:
+                    print("[WARNING] Arduino returned invalid Compass data, state elements unchanged.")
+                    print("Data received: " + dataRecvd)
+            n += 1
     return State
     
 def setMotorSpeed(State):
@@ -157,19 +181,18 @@ def setMotorSpeed(State):
                     nTrial +=1
                     waitingForReply = False
                     if nTrial>maxTrial:
-                        setSpeedDone = 1
+                        setSpeedDone = 1 # Do this to exit the loop
                         print("[ERROR] Pi CheckSum error, runout of trials! Speed may or may not set properly!")
-                else:
-                    if dataRecvd=="Er":
+                elif dataRecvd=="Er": # Arduino send "Er" whenever the checksum on its side is wrong
                         print("[ERROR] Arduino CheckSum error, trying again...")
                         nTrial +=1
                         waitingForReply = False
                         if nTrial>maxTrial:
-                            setSpeedDone = 1
+                            setSpeedDone = 1 # Do this to exit the loop
                             print("[ERROR] Arduino CheckSum error, runout of trials! Speed is not set!")
-                    else:
-                        print(dataRecvd)
-                        setSpeedDone = 1
-                        if ArduinoSer.inWaiting() < 10: 
-                            ArduinoSer.flushInput()
-                            waitingForReply = False
+                else:
+                    print(dataRecvd)
+                    setSpeedDone = 1
+                    if ArduinoSer.inWaiting() < 10: 
+                        ArduinoSer.flushInput()
+                        waitingForReply = False

@@ -27,46 +27,46 @@ print("Ax: " + str(state.IMU.x_accel) + ", Ay: " + str(state.IMU.y_accel) + \
       ", Az: " + str(state.IMU.z_accel) + ", Gx: " + str(state.IMU.x_gyro) + \
       ", Gy: " + str(state.IMU.y_gyro) + ", Gz: " + str(state.IMU.z_gyro))
 
-print("Mx: " + str(state.Compass.x_mag) + \
-      ", My: " + str(state.Compass.y_mag) + \
-      ", Mz: " + str(state.Compass.z_mag))
+##print("Mx: " + str(state.Compass.x_mag) + \
+##      ", My: " + str(state.Compass.y_mag) + \
+##      ", Mz: " + str(state.Compass.z_mag))
 print
-time.sleep(5)
+time.sleep(2)
 
 # Update motorspeed
 state.LeftMotorSpeed = 100
 state.RightMotorSpeed = 100
 comm.setMotorSpeed(state)
 print
-time.sleep(5)
+time.sleep(2)
 
 # Update motorspeed
 state.LeftMotorSpeed = -50
 state.RightMotorSpeed = 140
 comm.setMotorSpeed(state)
 print
-time.sleep(5)
+time.sleep(2)
 
 # Update motorspeed
 state.LeftMotorSpeed = 40
 state.RightMotorSpeed = -100
 comm.setMotorSpeed(state)
 print
-time.sleep(5)
+time.sleep(2)
 
 # Update motorspeed
 state.LeftMotorSpeed = -120
 state.RightMotorSpeed = -120
 comm.setMotorSpeed(state)
 print
-time.sleep(5)
+time.sleep(2)
 
 # Update motorspeed
 state.LeftMotorSpeed = -150
 state.RightMotorSpeed = -100
 comm.setMotorSpeed(state)
 print
-time.sleep(5)
+time.sleep(2)
 
 # Update encodersprint
 comm.updateData(state)
@@ -79,11 +79,11 @@ print("Ax: " + str(state.IMU.x_accel) + ", Ay: " + str(state.IMU.y_accel) + \
       ", Az: " + str(state.IMU.z_accel) + ", Gx: " + str(state.IMU.x_gyro) + \
       ", Gy: " + str(state.IMU.y_gyro) + ", Gz: " + str(state.IMU.z_gyro))
 
-print("Mx: " + str(state.Compass.x_mag) + \
-      ", My: " + str(state.Compass.y_mag) + \
-      ", Mz: " + str(state.Compass.z_mag))
+##print("Mx: " + str(state.Compass.x_mag) + \
+##      ", My: " + str(state.Compass.y_mag) + \
+##      ", Mz: " + str(state.Compass.z_mag))
 print
-time.sleep(5)
+time.sleep(2)
 
 # Update motorspeed
 state.LeftMotorSpeed = 0
