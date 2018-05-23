@@ -5,14 +5,17 @@ from picamera import PiCamera
 import time
 from classes.Pose import Pose
 from classes.ImageData import ImageData
-
+from classes.State import State
 
 # Tuning Constants
 POSE_TOLERANCE = 10
 
+# Empty database
+database = []
+
 # Setup camera
 camera = PiCamera()
-camera.resolution = (1296,972)
+camera.resolution = (1312,976)
 camera.framerate = 30
 #Wait
 time.sleep(1.0)
@@ -43,17 +46,11 @@ def get_img():
 	# Resize TODO
 	return output
 
-# Captures a single image from the camera and returns it in PIL format
-def get_image():
-	# read is the easiest way to get a full image out of a VideoCapture object.
-	camera = cv2.VideoCapture(camera_port)
-	retval, im = camera.read()
-	im = cv2.resize(cv2.cvtColor(im, cv2.COLOR_BGR2GRAY),(320,240))
-	del(camera)	
-	return im
 
-def find_location(img, database, pose):
+
+def find_location(database, pose):
 	# Search the data base for images that are close to the current estimated location
+	img = get_img()
 	database_temp = []
 	for data in database:
 		if (pose.x - data.pose.x < POSE_TOLERANCE and pose.x - data.pose.x > -POSE_TOLERANCE) \
@@ -68,8 +65,8 @@ def find_location(img, database, pose):
 		error = np.mean(img_diff)
 		error_database.append((error, data.pose))
 
-		im_stack = np.hstack((data.img,img))
-		im_stack = np.hstack((im_stack, img_diff))
+		im_stack = np.vstack((data.img,img))
+		im_stack = np.vstack((im_stack, img_diff))
 		cv2.imshow("Database img, current image, difference", im_stack)
 		#print("Error is " + str(error))	
 		cv2.waitKey(100)
@@ -84,16 +81,25 @@ def build_database():
 	while 1:
 		key = raw_input("Enter pose x value (press e to finish)")
 		if key == 'E' or key == 'e':
-			np.save('modules/data/database.npy',np.asarray(database))
+			np.save('modules/data/database.npy',database)
 			return database
-		pose = class_info.Pose(int(key),0,0)
-		capture = get_image()
-		database.append(class_info.ImageData(capture,pose))
-		cv2.imwrite('img.png',capture)
+		pose = Pose(int(key),0,0,0,0,0)
+		capture = get_img()
+		database.append(ImageData(capture,pose))
+		#cv2.imwrite('img.png',capture)
+
+def database_append(state):
+	capture = get_img()
+	database.append(ImageData(capture,state.Pose))
+	#cv2.imwrite('img.png',capture)
+
+def database_finalize():
+	np.save('modules/data/database.npy',database)
+	return database
 
 def load_database():
 	database = np.load('modules/data/database.npy')
-	database.toList()
+	#database.toList()
 	return database
 
 
