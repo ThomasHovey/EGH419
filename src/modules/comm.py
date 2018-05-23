@@ -79,6 +79,7 @@ def updateData(State):
     splitData_En = 0;
     maxTrial = 5;
     nTrial = 0;
+    MaxTimeOut = 0.2
     while n < len(cmdData):
         cmd = cmdData[n]
         waitingForReply = False
@@ -88,7 +89,13 @@ def updateData(State):
             waitingForReply = True
         # Wait for Arduino to respond
         while waitingForReply:
+            start_waiting = time.time()
             while ArduinoSer.inWaiting() == 0:
+                curr_waiting = time.time()
+                if (curr_waiting-start_waiting)>MaxTimeOut:
+                    waitingForReply = False
+                    n = len(cmdData) + 1 # Do this to exit the loop
+                    print("[ERROR] Transmission time out ! Data update failed!")
                 pass    
             dataRecvd,checksum_error = recvFromArduino()
             # Checksum
@@ -110,9 +117,8 @@ def updateData(State):
                     print("[ERROR] Arduino CheckSum error, runout of trials! Data update failed!")
             else:
                 splitData_En = 1
-            if ArduinoSer.inWaiting() < 10: 
-                ArduinoSer.flushInput()
-                waitingForReply = False
+            ArduinoSer.flushInput()
+            waitingForReply = False
 
         if splitData_En:    
             # Spilt data base on command
@@ -163,6 +169,8 @@ def setMotorSpeed(State):
         setSpeedDone = 0;
         maxTrial = 5;
         nTrial = 0;
+        MaxTimeOut = 0.2
+        time_out = 0
         while not setSpeedDone:
             waitingForReply = False
             # Send command to Arduino
@@ -171,28 +179,35 @@ def setMotorSpeed(State):
                 waitingForReply = True
             # Wait for Arduino to respond
             while waitingForReply:
+                start_waiting = time.time() 
                 while ArduinoSer.inWaiting() == 0:
-                    pass    
-                dataRecvd,checksum_error = recvFromArduino()
-##                checksum_error = 1
-##                dataRecvd = "Er"
-                if checksum_error != 0: # Error occured
-                    print("[ERROR] Pi CheckSum error, trying again...")
-                    nTrial +=1
-                    waitingForReply = False
-                    if nTrial>maxTrial:
-                        setSpeedDone = 1 # Do this to exit the loop
-                        print("[ERROR] Pi CheckSum error, runout of trials! Speed may or may not set properly!")
-                elif dataRecvd=="Er": # Arduino send "Er" whenever the checksum on its side is wrong
-                        print("[ERROR] Arduino CheckSum error, trying again...")
+                    curr_waiting = time.time()
+                    if (curr_waiting-start_waiting)>MaxTimeOut:
+                        waitingForReply = False
+                        setSpeedDone = 1
+                        time_out = 1
+                        print("[ERROR] Transmission time out ! Data update failed!")
+                    pass
+                if time_out == 0:
+                    dataRecvd,checksum_error = recvFromArduino()
+    ##                checksum_error = 1
+    ##                dataRecvd = "Er"
+                    if checksum_error != 0: # Error occured
+                        print("[ERROR] Pi CheckSum error, trying again...")
                         nTrial +=1
                         waitingForReply = False
                         if nTrial>maxTrial:
                             setSpeedDone = 1 # Do this to exit the loop
-                            print("[ERROR] Arduino CheckSum error, runout of trials! Speed is not set!")
-                else:
-                    print(dataRecvd)
-                    setSpeedDone = 1
-                    if ArduinoSer.inWaiting() < 10: 
-                        ArduinoSer.flushInput()
-                        waitingForReply = False
+                            print("[ERROR] Pi CheckSum error, runout of trials! Speed may or may not set properly!")
+                    elif dataRecvd=="Er": # Arduino send "Er" whenever the checksum on its side is wrong
+                            print("[ERROR] Arduino CheckSum error, trying again...")
+                            nTrial +=1
+                            waitingForReply = False
+                            if nTrial>maxTrial:
+                                setSpeedDone = 1 # Do this to exit the loop
+                                print("[ERROR] Arduino CheckSum error, runout of trials! Speed is not set!")
+                    else:
+                        print(dataRecvd)
+                        setSpeedDone = 1
+                ArduinoSer.flushInput()
+                waitingForReply = False

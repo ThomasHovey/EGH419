@@ -246,7 +246,7 @@ void Communication_Handler() {
         SerialReply2Pi(mag_report);
       }
       else {
-        SerialReply2Pi("<Failed to detect and initialize magnetometer!>");
+        SerialReply2Pi("<Arduino failed to detect and initialize magnetometer!>");
       }
     }
     else
