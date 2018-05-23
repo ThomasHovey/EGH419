@@ -12,7 +12,7 @@ POSE_TOLERANCE = 10
 
 # Setup camera
 camera = PiCamera()
-camera.resolution = (1296,972)
+camera.resolution = (1312,976)
 camera.framerate = 30
 #Wait
 time.sleep(1.0)
