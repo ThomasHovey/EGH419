@@ -4,9 +4,12 @@ from classes.Pose import Pose
 import math
 
 
-WIDTH = 20.0
+WIDTH = 100.0
 Vdr = 3
 Vdl = 3 
+trust_value_imu = 0.0
+trust_value_encoder = 1.0
+trust_value_desired =  0.0
 
 def map_encoder(state):
 
@@ -61,25 +64,44 @@ def get_desired_vel(state):
 
 	# Calculate new positions
 	pose.omega = omega
+	# The old heading Plus the new change in angular velocity times by time to achieve new heading  
 	pose.x_vel = V*math.cos(state.Pose.theta + omega*state.Time)
 	pose.y_vel = V*math.sin(state.Pose.theta + omega*state.Time)
 	
 	return pose
 	
+	
+	
 # localization state
 def update(state):
+
+
 	encoder_vel = map_encoder(state)
 	IMU_vel = map_IMU_data(state)
 	desired_vel = get_desired_vel(state)
+	
+	
+	pose = Pose(0,0,0,0,0,0)
+	
+	# Perform weighting and divided by 3 to get an average
+	pose.omega = ((encoder_vel.omega * trust_value_encoder) + (IMU_vel.omega * trust_value_imu) + (desired_vel.omega * trust_value_desired))
+	
+	pose.x_vel = ((encoder_vel.x_vel * trust_value_encoder) + (IMU_vel.x_vel * trust_value_imu) + (desired_vel.x_vel * trust_value_desired))
+	
+	pose.y_vel = ((encoder_vel.y_vel * trust_value_encoder) + (IMU_vel.y_vel * trust_value_imu) + (desired_vel.y_vel * trust_value_desired))
+	
 
-	pose = encoder_vel
 
-	# Get postion acording to encoders
+	# Get position according to the encoders
+	# Old position plus the new change in position to achieve new position
 	pose.theta = state.Pose.theta + pose.omega * state.Time
 	pose.x = state.Pose.x + pose.x_vel * state.Time
 	pose.y = state.Pose.y + pose.y_vel * state.Time
 	
+
 	state.Pose = pose
+	
+	
 	return
 
 

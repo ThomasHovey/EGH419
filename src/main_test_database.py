@@ -15,9 +15,9 @@ time.sleep(0.1)
 
 	
 # Build database
-#database = place_recog.build_database()
+database = place_recog.build_database()
 
-database = place_recog.load_database()
+#database = place_recog.load_database()
 
 
 # Setup current location
@@ -28,10 +28,8 @@ while 1:
 	# key = raw_input("Enter any key to check (e or E to exit)")
 	# if key == 'E' or key == 'e':
 	# 	break
-	capture = place_recog.get_img()
-
 	# Image search for closest image
-	new_pose, error = place_recog.find_location(capture, database, pose_current)
+	new_pose, error = place_recog.find_location(database, pose_current)
 
 	# Print answer
 	print("Pos : " + str(new_pose.x) + " Error : " + str(error))
