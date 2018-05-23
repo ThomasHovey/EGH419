@@ -43,14 +43,7 @@ def get_img():
 	# Resize TODO
 	return output
 
-# Captures a single image from the camera and returns it in PIL format
-def get_image():
-	# read is the easiest way to get a full image out of a VideoCapture object.
-	camera = cv2.VideoCapture(camera_port)
-	retval, im = camera.read()
-	im = cv2.resize(cv2.cvtColor(im, cv2.COLOR_BGR2GRAY),(320,240))
-	del(camera)	
-	return im
+
 
 def find_location(img, database, pose):
 	# Search the data base for images that are close to the current estimated location
@@ -87,7 +80,7 @@ def build_database():
 			np.save('modules/data/database.npy',np.asarray(database))
 			return database
 		pose = Pose(int(key),0,0,0,0,0)
-		capture = get_image()
+		capture = get_img()
 		database.append(ImageData(capture,pose))
 		#cv2.imwrite('img.png',capture)
 
