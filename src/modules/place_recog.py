@@ -5,10 +5,13 @@ from picamera import PiCamera
 import time
 from classes.Pose import Pose
 from classes.ImageData import ImageData
-
+from classes.State import State
 
 # Tuning Constants
 POSE_TOLERANCE = 10
+
+# Empty database
+database = []
 
 # Setup camera
 camera = PiCamera()
@@ -45,8 +48,9 @@ def get_img():
 
 
 
-def find_location(img, database, pose):
+def find_location(database, pose):
 	# Search the data base for images that are close to the current estimated location
+	img = get_img()
 	database_temp = []
 	for data in database:
 		if (pose.x - data.pose.x < POSE_TOLERANCE and pose.x - data.pose.x > -POSE_TOLERANCE) \
@@ -83,6 +87,15 @@ def build_database():
 		capture = get_img()
 		database.append(ImageData(capture,pose))
 		#cv2.imwrite('img.png',capture)
+
+def database_append(state):
+	capture = get_img()
+	database.append(ImageData(capture,state.Pose))
+	#cv2.imwrite('img.png',capture)
+
+def database_finalize():
+	np.save('modules/data/database.npy',database)
+	return database
 
 def load_database():
 	database = np.load('modules/data/database.npy')
