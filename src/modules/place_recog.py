@@ -68,8 +68,8 @@ def find_location(img, database, pose):
 		error = np.mean(img_diff)
 		error_database.append((error, data.pose))
 
-		im_stack = np.hstack((data.img,img))
-		im_stack = np.hstack((im_stack, img_diff))
+		im_stack = np.vstack((data.img,img))
+		im_stack = np.vstack((im_stack, img_diff))
 		cv2.imshow("Database img, current image, difference", im_stack)
 		#print("Error is " + str(error))	
 		cv2.waitKey(100)
@@ -86,10 +86,10 @@ def build_database():
 		if key == 'E' or key == 'e':
 			np.save('modules/data/database.npy',np.asarray(database))
 			return database
-		pose = class_info.Pose(int(key),0,0)
+		pose = class_info.Pose(int(key),0,0,0,0,0)
 		capture = get_image()
 		database.append(class_info.ImageData(capture,pose))
-		cv2.imwrite('img.png',capture)
+		#cv2.imwrite('img.png',capture)
 
 def load_database():
 	database = np.load('modules/data/database.npy')
