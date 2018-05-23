@@ -15,8 +15,8 @@ time.sleep(0.1)
 
 state = State()
 
-state.LeftMotorSpeed = 60
-state.RightMotorSpeed = 50
+state.LeftMotorSpeed = 50
+state.RightMotorSpeed = 40
 # Init serial to arduino
 comm.Serial_init()
 

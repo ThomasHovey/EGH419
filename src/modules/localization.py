@@ -35,9 +35,9 @@ def map_encoder(state):
 
 def map_IMU_data(state):
 	# Calculate new pose from imu data
-	x_accel = state.IMU.x_accel
-	y_accel = state.IMU.y_accel
-	z_gyro = state.IMU.z_gyro 
+	x_accel = state.IMU.x_accel *981
+	y_accel = state.IMU.y_accel * 981
+	z_gyro = state.IMU.z_gyro *981
 
 	# Create a new pose value for velocity
 	pose = Pose(0,0,0,0,0,0)
