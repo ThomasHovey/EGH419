@@ -8,7 +8,7 @@ from classes.ImageData import ImageData
 from classes.State import State
 
 # Tuning Constants
-POSE_TOLERANCE = 10
+POSE_TOLERANCE = 1000
 
 # Empty database
 database = []
@@ -56,6 +56,7 @@ def find_location(database, pose):
 		if (pose.x - data.pose.x < POSE_TOLERANCE and pose.x - data.pose.x > -POSE_TOLERANCE) \
 		and (pose.y - data.pose.y < POSE_TOLERANCE and pose.y - data.pose.y > -POSE_TOLERANCE):
 			database_temp.append(data)
+	database_temp = database
 	# Search the close images for one that matches our location
 	error_database = []
 	for data in database_temp:
@@ -69,7 +70,7 @@ def find_location(database, pose):
 		im_stack = np.vstack((im_stack, img_diff))
 		cv2.imshow("Database img, current image, difference", im_stack)
 		#print("Error is " + str(error))	
-		cv2.waitKey(100)
+		cv2.waitKey(10)
 	# Use the pose with the lowest error
 	
 	# cv2.destroyAllWindows()
