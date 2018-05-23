@@ -86,9 +86,9 @@ def build_database():
 		if key == 'E' or key == 'e':
 			np.save('modules/data/database.npy',np.asarray(database))
 			return database
-		pose = class_info.Pose(int(key),0,0,0,0,0)
+		pose = Pose(int(key),0,0,0,0,0)
 		capture = get_image()
-		database.append(class_info.ImageData(capture,pose))
+		database.append(ImageData(capture,pose))
 		#cv2.imwrite('img.png',capture)
 
 def load_database():
