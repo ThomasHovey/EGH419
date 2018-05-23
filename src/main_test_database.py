@@ -19,7 +19,7 @@ database = place_recog.build_database()
 
 database_new = place_recog.load_database()
 
-if database == database_new:
+if database.all() == database_new.all():
 	print("Database loaded correctly\n")
 else:
 	print("Database load failed\n")
