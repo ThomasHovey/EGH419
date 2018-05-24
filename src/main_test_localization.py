@@ -1,4 +1,4 @@
-import cv2
+#import cv2
 import numpy as np
 #from picamera.array import PiRGBArray
 #from picamera import PiCamera 
@@ -15,8 +15,8 @@ time.sleep(0.1)
 
 state = State()
 
-state.LeftMotorSpeed = 50
-state.RightMotorSpeed = 40
+state.LeftMotorSpeed = 0.0
+state.RightMotorSpeed = 0.0
 # Init serial to arduino
 comm.Serial_init()
 
@@ -39,7 +39,7 @@ i=0
 comm.setMotorSpeed(state)
 old_time = time.time()
 
-while i < 15:
+while 1:
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
