@@ -212,3 +212,24 @@ def setMotorSpeed(State):
                 ArduinoSer.flushInput()
                 waitingForReply = False
 
+def IMU_config():
+    ax_list, ay_list, zg_list = []
+    state = State()
+    for i in range(50):
+        # Read encoder data ect
+        comm.updateData(state)
+        ax_list.append(state.IMU.x_accel)
+        ay_list.append(state.IMU.y_accel)
+        zg_list.append(state.IMU.z_gyro)
+
+    x_offset = sum(ax_list)/float(len(ax_list))
+    y_offset = sum(ay_list)/float(len(ay_list))
+    z_offset = sum(zg_list)/float(len(zg_list))
+    
+    print("X offset")
+    print(x_offset)
+    print("Y offset")
+    print(y_offset)
+    print("Z offset")
+    print(z_offset)
+    
