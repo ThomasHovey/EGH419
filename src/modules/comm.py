@@ -4,6 +4,10 @@ from classes.State import State
 from classes.IMU import IMU
 from classes.Compass import Compass
 
+x_offset = -0.07913652
+y_offset = 0.023073
+z_offset = -3.618475
+
 def Serial_init():
     global startMarker, endMarker, ArduinoSer
     startMarker = 60
@@ -135,12 +139,12 @@ def updateData(State):
                 try:
                     split_data = dataRecvd.split(" ")
                     Ax,Ay,Az,Gx,Gy,Gz = split_data
-                    Acc_x = float(Ax)*0.061/1000 # in g, 0.061 is scale factor
-                    Acc_y = float(Ay)*0.061/1000 # in g, 0.061 is scale factor
+                    Acc_x = float(Ax)*0.061/1000 - x_offset # in g, 0.061 is scale factor
+                    Acc_y = float(Ay)*0.061/1000 - y_offset# in g, 0.061 is scale factor
                     Acc_z = float(Az)*0.061/1000 # in g, 0.061 is scale factor
                     Gyr_x = float(Gx)*4.375/1000 # in dps, 4.375 is scale factor
                     Gyr_y = float(Gy)*4.375/1000 # in dps, 4.375 is scale factor
-                    Gyr_z = float(Gz)*4.375/1000 # in dps, 4.375 is scale factor 
+                    Gyr_z = float(Gz)*4.375/1000 - z_offset# in dps, 4.375 is scale factor 
                     State.IMU = IMU(Acc_x,Acc_y,Acc_z,Gyr_x,Gyr_y,Gyr_z)
                 except ValueError as error:
                     print("[WARNING] Arduino returned invalid IMU data, state elements unchanged.")
@@ -213,11 +217,11 @@ def setMotorSpeed(State):
                 waitingForReply = False
 
 def IMU_config():
-    ax_list, ay_list, zg_list = []
+    ax_list, ay_list, zg_list = [],[],[]
     state = State()
     for i in range(50):
         # Read encoder data ect
-        comm.updateData(state)
+        updateData(state)
         ax_list.append(state.IMU.x_accel)
         ay_list.append(state.IMU.y_accel)
         zg_list.append(state.IMU.z_gyro)
