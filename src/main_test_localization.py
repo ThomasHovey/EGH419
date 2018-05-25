@@ -15,8 +15,8 @@ time.sleep(0.1)
 
 state = State()
 
-state.LeftMotorSpeed = 0.0
-state.RightMotorSpeed = 0.0
+state.LeftMotorSpeed = 50
+state.RightMotorSpeed = 50
 # Init serial to arduino
 comm.Serial_init()
 
@@ -39,7 +39,7 @@ i=0
 comm.setMotorSpeed(state)
 old_time = time.time()
 
-while 1:
+while state.Pose.x < 200:
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
@@ -51,15 +51,101 @@ while 1:
 	pathx.append(state.Pose.x)
 	pathy.append(state.Pose.y)
 	# plot new position
-	line1.set_xdata(state.Pose.x)
-	line1.set_ydata(state.Pose.y)
-	line2.set_xdata(pathx)
-	line2.set_ydata(pathy)
+	#line1.set_xdata(state.Pose.x)
+	#line1.set_ydata(state.Pose.y)
+	#line2.set_xdata(pathx)
+	#line2.set_ydata(pathy)
 	
-	fig.canvas.draw()
-	fig.canvas.flush_events()
+	#fig.canvas.draw()
+	#fig.canvas.flush_events()
 	i += 1
 
+# Stop
+state.LeftMotorSpeed = 0
+state.RightMotorSpeed = 0
+comm.setMotorSpeed(state)
+
+# Update plot
+line1.set_xdata(state.Pose.x)
+line1.set_ydata(state.Pose.y)
+line2.set_xdata(pathx)
+line2.set_ydata(pathy)
+
+fig.canvas.draw()
+fig.canvas.flush_events()
+
+
+# Turn
+state.LeftMotorSpeed = -25
+state.RightMotorSpeed = 25
+comm.setMotorSpeed(state)
+
+
+# Update motor speeds
+comm.setMotorSpeed(state)
+old_time = time.time()
+
+while state.Pose.theta < 90:
+	print("Theta")
+	print(state.Pose.theta)
+	# Read encoder data ect
+	comm.updateData(state)
+	# Find time 
+	state.Time = time.time() - old_time
+	old_time = time.time()
+	# Update localization
+	localization.update(state)
+	# add points to path 
+	pathx.append(state.Pose.x)
+	pathy.append(state.Pose.y)
+	# plot new position
+	#line1.set_xdata(state.Pose.x)
+	#line1.set_ydata(state.Pose.y)
+	#line2.set_xdata(pathx)
+	#line2.set_ydata(pathy)
+
+# Stop
+state.LeftMotorSpeed = 0
+state.RightMotorSpeed = 0
+comm.setMotorSpeed(state)
+
+# Update plot
+line1.set_xdata(state.Pose.x)
+line1.set_ydata(state.Pose.y)
+line2.set_xdata(pathx)
+line2.set_ydata(pathy)
+
+fig.canvas.draw()
+fig.canvas.flush_events()
+
+# Move foward
+state.LeftMotorSpeed = 30
+state.RightMotorSpeed = 30
+comm.setMotorSpeed(state)
+old_time = time.time()
+
+while state.Pose.y < 200:
+	# Read encoder data ect
+	comm.updateData(state)
+	# Find time 
+	state.Time = time.time() - old_time
+	old_time = time.time()
+	# Update localization
+	localization.update(state)
+	# add points to path 
+	pathx.append(state.Pose.x)
+	pathy.append(state.Pose.y)
+	
+# Update plot
+line1.set_xdata(state.Pose.x)
+line1.set_ydata(state.Pose.y)
+line2.set_xdata(pathx)
+line2.set_ydata(pathy)
+
+fig.canvas.draw()
+fig.canvas.flush_events()
+
+# Stop
 state.LeftMotorSpeed = 0
 state.RightMotorSpeed = 0
 comm.setMotorSpeed(state)

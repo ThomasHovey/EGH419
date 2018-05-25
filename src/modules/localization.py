@@ -4,19 +4,19 @@ from classes.Pose import Pose
 import math
 
 
-WIDTH = 100.0 #mm
+WIDTH = 1.37
 Vdr = 3
 Vdl = 3 
-trust_value_imu = 1.0
-trust_value_encoder = 0.0
+trust_value_imu = 0.0
+trust_value_encoder = 1.0
 trust_value_desired =  0.0
-
+a = 3
 
 def map_encoder(state):
 
 	# Get l and r velocities
-	Vr = state.RightDistance/state.Time
-	Vl = state.LeftDistance/state.Time
+	Vr = a*(state.RightDistance)/state.Time
+	Vl = a*(state.LeftDistance)/state.Time
 
 	# Get angular velocity
 	omega = (Vr - Vl)/WIDTH
@@ -36,16 +36,9 @@ def map_encoder(state):
 
 def map_IMU_data(state):
 	# Calculate new pose from imu data
-	x_accel = state.IMU.y_accel *9810 # convert to mm per sec^2
-	y_accel = state.IMU.x_accel * 9810 # convert to mm per sec^2
-	z_gyro = state.IMU.z_gyro #deg per sec
-
-	print("X_accel = ")
-	print(x_accel)
-	print("\nY_accel = ")
-	print(y_accel)
-	print("\nZ_gyro = ")
-	print(z_gyro)
+	x_accel = state.IMU.y_accel *9806.65
+	y_accel = state.IMU.x_accel * 9806.65
+	z_gyro = state.IMU.z_gyro 
 
 	# Create a new pose value for velocity
 	pose = Pose(0,0,0,0,0,0)
@@ -75,6 +68,7 @@ def get_desired_vel(state):
 	# The old heading Plus the new change in angular velocity times by time to achieve new heading  
 	pose.x_vel = V*math.cos((state.Pose.theta +omega*state.Time)*(math.pi/180))
 	pose.y_vel = V*math.sin((state.Pose.theta +omega*state.Time)*(math.pi/180))
+	
 	return pose
 	
 	
@@ -112,8 +106,6 @@ def update(state):
 	return
 
 
-	
-	
-	
+
 	
 	

@@ -211,3 +211,4 @@ def setMotorSpeed(State):
                         setSpeedDone = 1
                 ArduinoSer.flushInput()
                 waitingForReply = False
+
