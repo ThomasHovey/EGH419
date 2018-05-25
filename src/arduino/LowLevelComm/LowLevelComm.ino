@@ -51,12 +51,23 @@
 #define Gear_ratio 100.0 // mm
 #define counts_per_mm 5.457 // counts_per_revolution*Gear_ratio/Wheel_circumference
 #define PID_loop_time 250 //ms
+#define Calibration_time 2000
 
 // IMU
 LSM6 imu; // Internal Measurement Unit
 LIS3MDL mag; // Compass
 bool imu_en = 1;
 bool mag_en = 1;
+int SS_update_rate = 5; //5ms
+unsigned long SS_last_update = 0;
+long ACC_X = 0;
+long ACC_Y = 0;
+long GYR_Z = 0;
+int IMU_read_counts = 0;
+long MAG_X = 0;
+long MAG_Y = 0;
+long MAG_Z = 0;
+int MAG_read_counts = 0;
 
 // Interrupts
 volatile int L_encoderCnts = 0;
@@ -159,7 +170,15 @@ void setup() {
     mag.enableDefault();
     SerialReply2Pi("<Magnetometer detected and initialized!>");
   }
-  delay(2000);
+//  if (imu_en||mag_en)
+//  {
+//    
+//    unsigned long start_calibrate = millis;
+//    long read_count;
+//    while (millis-start_calibrate)<Calibration_time
+//    delay(2000);
+//  }
+  delay(1000);
   SerialReply2Pi("<Arduino is ready>");
 }
 
@@ -169,6 +188,10 @@ void loop()
   if (stringComplete)
   {
     Communication_Handler();
+  }
+  else
+  {
+    Read_sensor_continuously();
   }
   switch (motor_mode) {
     case 0:
@@ -225,11 +248,17 @@ void Communication_Handler() {
     else if (command == "IMU")
     {
       if (imu_en) {
-        imu.read();
         char imu_report[80];
-        snprintf(imu_report, sizeof(imu_report), "<%d %d %d %d %d %d>",
-                 imu.a.x, imu.a.y, imu.a.z,
-                 imu.g.x, imu.g.y, imu.g.z);
+        long ave_acc_x = ACC_X/IMU_read_counts;
+        long ave_acc_y = ACC_Y/IMU_read_counts;
+        long ave_gyr_z = GYR_Z/IMU_read_counts;
+        // Reset value after read
+        ACC_X = 0;
+        ACC_Y = 0;
+        GYR_Z = 0;
+        IMU_read_counts = 0;
+        snprintf(imu_report, sizeof(imu_report), "<%ld %ld %ld>",
+                 ave_acc_x, ave_acc_y, ave_gyr_z);
         SerialReply2Pi(imu_report);
       }
       else {
@@ -241,8 +270,16 @@ void Communication_Handler() {
       if (imu_en) {
         mag.read();
         char mag_report[80];
-        snprintf(mag_report, sizeof(mag_report), "<%d %d %d>",
-                 mag.m.x, mag.m.y, mag.m.z);
+        long ave_mag_x = MAG_X/MAG_read_counts;
+        long ave_mag_y = MAG_Y/MAG_read_counts;
+        long ave_mag_z = MAG_Z/MAG_read_counts;
+        // Reset value after read
+        MAG_X = 0;
+        MAG_Y = 0;
+        MAG_Z = 0;
+        MAG_read_counts = 0;
+        snprintf(mag_report, sizeof(mag_report), "<%ld %ld %ld>",
+                 ave_mag_x, ave_mag_y, ave_mag_z);
         SerialReply2Pi(mag_report);
       }
       else {
@@ -379,7 +416,38 @@ void Constant_speed_mode() {
     lastmillis = millis(); // Uptade lasmillis
   }
 }
-
+/*----------------------------------------------------------------------------------------------------------------------------*/
+void Read_sensor_continuously()
+{
+  if ((millis() - SS_last_update)>SS_update_rate)
+  {
+    if (imu_en)
+    {
+      imu.read();
+      ACC_X = ACC_X + imu.a.x;
+      ACC_Y = ACC_Y + imu.a.y;
+      GYR_Z = GYR_Z + imu.g.z;
+//      Serial.print("IMU: ");
+//      Serial.print(ACC_X);
+//      Serial.print(", ");
+//      Serial.print(ACC_Y);
+//      Serial.print(", ");
+//      Serial.println(GYR_Z);
+//      
+      IMU_read_counts++;
+    }
+    if (mag_en)
+    {
+      mag.read();
+      MAG_X = MAG_X + mag.m.x;
+      MAG_Y = MAG_Y + mag.m.y;
+      MAG_Z = MAG_Z + mag.m.z;
+      MAG_read_counts++;
+    }
+    SS_last_update = millis();
+  }
+ 
+}
 /*----------------------------------------------------------------------------------------------------------------------------*/
 void L_Encoder_Int() {
   this_L_interrupt = millis();
