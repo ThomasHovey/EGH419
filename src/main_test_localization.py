@@ -10,6 +10,7 @@ from modules.classes.State import State
 import modules.comm as comm
 import modules.localization as localization
 import matplotlib.pyplot as plt
+import math
 
 time.sleep(0.1)
 
@@ -120,25 +121,25 @@ old_time = time.time()
 # print(state.Pose.x)
 
 # Turn
-state.LeftMotorSpeed = -25
-state.RightMotorSpeed = 25
+state.LeftMotorSpeed = 0
+state.RightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 
 # Update motor speeds
 comm.setMotorSpeed(state)
 old_time = time.time()
-
-while state.Pose.theta < 90:
-	print("Theta")
-	print(state.Pose.theta)
+i = 0
+while i < 100:
+	# print("Theta")
+	# print(state.Pose.theta)
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
 	state.Time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
-	localization.update(state)
+	encoder,IMU,desired = localization.update(state)
 	# add points to path 
 	pathx.append(state.Pose.x)
 	pathy.append(state.Pose.y)
@@ -147,25 +148,36 @@ while state.Pose.theta < 90:
 	#line1.set_ydata(state.Pose.y)
 	#line2.set_xdata(pathx)
 	#line2.set_ydata(pathy)
+	i += 1
 
 # Stop
 state.LeftMotorSpeed = 0
 state.RightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
-heading1, = ax.plot(state.Pose.x*math.cos(state.Pose.Theta *(math.pi/180)),state.Pose.y*math.sin(state.Pose.Theta *(math.pi/180)))
-heading3, = ax.plot(encoder.x*math.cos(encoder.Theta *(math.pi/180)),encoder.y*math.sin(encoder.Theta *(math.pi/180)))
-heading4, = ax.plot(IMU.x*math.cos(IMU.Theta *(math.pi/180)),IMU.y*math.sin(IMU.Theta *(math.pi/180)))
-heading5, = ax.plot(desired.x*math.cos(desired.Theta *(math.pi/180)),desired.y*math.sin(desired.Theta *(math.pi/180)))
+heading1, = ax.plot(state.Pose.x*math.cos(state.Pose.theta *(math.pi/180)),state.Pose.y*math.sin(state.Pose.theta *(math.pi/180)))
+# heading3, = ax.plot(encoder.x*math.cos(encoder.theta *(math.pi/180)),encoder.y*math.sin(encoder.theta *(math.pi/180)))
+# heading4, = ax.plot(IMU.x*math.cos(IMU.theta *(math.pi/180)),IMU.y*math.sin(IMU.theta *(math.pi/180)))
+# heading5, = ax.plot(desired.x*math.cos(desired.theta *(math.pi/180)),desired.y*math.sin(desired.theta *(math.pi/180)))
 # Update plot
 line1.set_xdata(state.Pose.x)
 line1.set_ydata(state.Pose.y)
 line2.set_xdata(pathx)
 line2.set_ydata(pathy)
+# line3.set_xdata(pathx_enc)
+# line3.set_ydata(pathy_enc)
+# line4.set_xdata(pathx_IMU)
+# line4.set_ydata(pathy_IMU)
+# line5.set_xdata(pathx_des)
+# line5.set_ydata(pathy_des)
 
 fig.canvas.draw()
 fig.canvas.flush_events()
 
+print("X")
+print(state.Pose.x)
+print("Y")
+print(state.Pose.y)
 print("Theta")
 print(state.Pose.theta)
 

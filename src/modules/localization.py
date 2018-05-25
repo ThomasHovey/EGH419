@@ -5,8 +5,8 @@ import math
 
 
 WIDTH = 1.585
-trust_value_imu = 0.0
-trust_value_encoder = 1.0
+trust_value_imu = 1.0
+trust_value_encoder = 0.0
 trust_value_desired =  0.0
 a = 4.8
 

@@ -8,6 +8,6 @@ class State:
 		self.RightMotorSpeed = 0
 		self.LeftDistance = 0
 		self.RightDistance = 0
-		self.IMU = IMU(0,0,0,0,0,0)
+		self.IMU = IMU(0,0,0)
 		self.Pose = Pose(0,0,0,0,0,0)
 		self.Time = 0
