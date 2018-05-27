@@ -20,27 +20,29 @@ state = State()
 
 # Init serial to arduino
 comm.Serial_init()
-plotting.init_plot()
 
 # Set motor speeds
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.LeftMotorSpeed = 30
+state.RightMotorSpeed = 30
 comm.setMotorSpeed(state)
 
 # Loop
 old_time = time.time()
 i = 0
-while i < 100:
+while state.Pose.x < 200 :
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
 	state.Time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
-	encoder,IMU,desired = localization.update(state)
+	localization.update(state)
 
 	# Update plot
-	plotting.update_plot(state.Pose, encoder, IMU, desired)
+	plotting.update_plot(state.Pose)
+	if i == 5:
+		plotting.draw_plot(state.Pose)
+		i = 0
 
 	i += 1
 
@@ -50,13 +52,83 @@ state.RightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.Pose, encoder, IMU, desired)
+plotting.draw_plot(state.Pose)
 
-print("X")
+
+# Set motor speeds
+state.LeftMotorSpeed = -13
+state.RightMotorSpeed = 13
+comm.setMotorSpeed(state)
+
+# Loop
+old_time = time.time()
+i = 0
+while state.Pose.theta < 90 or state.Pose.theta > 200 :
+	print(state.Pose.theta)
+	# Read encoder data ect
+	comm.updateData(state)
+	# Find time 
+	state.Time = time.time() - old_time
+	old_time = time.time()
+	# Update localization
+	localization.update(state)
+
+	# Update plot
+	plotting.update_plot(state.Pose)
+	if i == 5:
+		plotting.draw_plot(state.Pose)
+		i = 0
+
+	i += 1
+
+# Stop
+state.LeftMotorSpeed = 0
+state.RightMotorSpeed = 0
+comm.setMotorSpeed(state)
+
+# Draw Plot
+plotting.draw_plot(state.Pose)
+
+# Set motor speeds
+state.LeftMotorSpeed = 25
+state.RightMotorSpeed = 25
+comm.setMotorSpeed(state)
+
+# Loop
+old_time = time.time()
+i = 0
+while state.Pose.y < 200 :
+	# Read encoder data ect
+	comm.updateData(state)
+	# Find time 
+	state.Time = time.time() - old_time
+	old_time = time.time()
+	# Update localization
+	localization.update(state)
+
+	# Update plot
+	plotting.update_plot(state.Pose)
+	if i == 5:
+		plotting.draw_plot(state.Pose)
+		i = 0
+
+	i += 1
+
+# Stop
+state.LeftMotorSpeed = 0
+state.RightMotorSpeed = 0
+comm.setMotorSpeed(state)
+
+# Draw Plot
+plotting.draw_plot(state.Pose)
+
+
+print('X')
 print(state.Pose.x)
-print("Y")
+
+print('Y')
 print(state.Pose.y)
-print("Theta")
+print('Theta')
 print(state.Pose.theta)
 
 

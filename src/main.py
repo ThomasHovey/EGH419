@@ -21,7 +21,6 @@ state = State()
 
 # Init serial to arduino
 comm.Serial_init()
-plotting.init_plot()
 
 # Chose mode
 text = raw_input("Build database or load existing? (load or build)")  # Python 2

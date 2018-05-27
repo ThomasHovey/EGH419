@@ -4,9 +4,9 @@ from classes.State import State
 from classes.IMU import IMU
 from classes.Compass import Compass
 
-x_offset = -0.0875724
-y_offset = 0.0150243
-z_offset = -3.53255
+x_offset = -0.04974672#-0.0875724
+y_offset = 0.0007307#0.0150243
+z_offset = -7.4264
 
 def Serial_init():
     global startMarker, endMarker, ArduinoSer
@@ -144,7 +144,7 @@ def updateData(State):
                     #Acc_z = float(Az)*0.061/1000 # in g, 0.061 is scale factor
                     #Gyr_x = float(Gx)*4.375/1000 # in dps, 4.375 is scale factor
                     #Gyr_y = float(Gy)*4.375/1000 # in dps, 4.375 is scale factor
-                    Gyr_z = float(Gz)*4.375/1000 - z_offset# in dps, 4.375 is scale factor 
+                    Gyr_z = float(Gz)*8.75/1000 - z_offset# in dps, 4.375 is scale factor 
                     State.IMU = IMU(Acc_x,Acc_y,Gyr_z)
                 except ValueError as error:
                     print("[WARNING] Arduino returned invalid IMU data, state elements unchanged.")

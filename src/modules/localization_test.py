@@ -1,37 +1,57 @@
+#import cv2
 import numpy as np
+#from picamera.array import PiRGBArray
+#from picamera import PiCamera 
 import time
-from classes.State import State
+#import place_recog as place_recog
 from classes.Pose import Pose
-import localization
+from classes.ImageData import ImageData
+from classes.State import State
+import plotting as plotting
+import comm as comm
+import localization as localization
 import matplotlib.pyplot as plt
+import math
 
+time.sleep(0.1)
+
+# Init state
 state = State()
 
-# Add distance
-state.LeftDistance = 0.2
-state.RightDistance = 0.5
-state.Time = 0.01
+# Init serial to arduino
+comm.Serial_init()
 
-# Setup plot
-plt.ion()
-fig = plt.figure()
-ax = fig.add_subplot(111)
-line1, = ax.plot(state.Pose.x, state.Pose.y, 'ro') # Returns a tuple of line objects, thus the comma
-plt.ylim(-50,50)
-plt.xlim(-50,50)
+# Set motor speeds
+state.LeftMotorSpeed = 0
+state.RightMotorSpeed = 0
+comm.setMotorSpeed(state)
 
-# Do 100 time steps
-i=0
-while i < 100:
-	localization.update(state)	
-	
-	# plot new position
-	line1.set_xdata(state.Pose.x)
-	line1.set_ydata(state.Pose.y)
-	fig.canvas.draw()
-	fig.canvas.flush_events()
+# Loop
+old_time = time.time()
+i = 0
+while 1:
+	# Read encoder data ect
+	comm.updateData(state)
+	# Find time 
+	state.Time = time.time() - old_time
+	old_time = time.time()
+	# Update localization
+	localization.update(state)
+
+	# Update plot
+	plotting.update_plot(state.Pose)
+	if i == 5:
+		plotting.draw_plot(state.Pose)
+		i = 0
+
+
 	i += 1
-	time.sleep(0.1)
 
+# Stop
+state.LeftMotorSpeed = 0
+state.RightMotorSpeed = 0
+comm.setMotorSpeed(state)
 
+# Draw Plot
+plotting.draw_plot(state.Pose)
 

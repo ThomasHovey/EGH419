@@ -3,7 +3,10 @@ import time
 from classes.State import State
 from classes.Pose import Pose
 import matplotlib.pyplot as plt
+import math
 
+# Setup length of line for bearing
+unit = 10
 
 # Create path list
 pathx = []
@@ -17,33 +20,56 @@ pathy_des = []
 pathx_img = []
 pathy_img = []
 
+pose = Pose(0,0,0,0,0,0)
 
-def init_plot(pose):
-	# Setup plot
-	plt.ion()
-	fig = plt.figure()
-	ax = fig.add_subplot(111)
-	line1, = ax.plot(pose.x, pose.y, 'r+') # Returns a tuple of line objects, thus the comma
-	line2, = ax.plot(pose.x, pose.y, 'b.') # Returns a tuple of line objects, thus the comma
-	line3, = ax.plot(pose.x, pose.y, 'g.') # Returns a tuple of line objects, thus the comma
-	line4, = ax.plot(pose.x, pose.y, 'r.') # Returns a tuple of line objects, thus the comma
-	line5, = ax.plot(pose.x, pose.y, 'y.') # Returns a tuple of line objects, thus the comma
+#Set limits
+yneg = -50
+ypos = 300
+xneg = -50
+xpos = 300
+# Setup plot
+plt.ion()
+fig = plt.figure()
+a = fig.add_subplot(111)
+# Set limit
+plt.ylim(yneg,ypos)
+plt.xlim(xneg,xpos)
+# b = fig.add_subplot(222)
+# # Set limit
+# plt.ylim(yneg,ypos)
+# plt.xlim(xneg,xpos)
+# c = fig.add_subplot(223)
+# # Set limit
+# plt.ylim(yneg,ypos)
+# plt.xlim(xneg,xpos)
+# d = fig.add_subplot(224)
+# # Set limit
+# plt.ylim(yneg,ypos)
+# plt.xlim(xneg,xpos)
 
-	# Set limit
-	plt.ylim(-500,500)
-	plt.xlim(-500,500)
+line1, = a.plot(pose.x, pose.y, 'r+') # Returns a tuple of line objects, thus the comma
+line2, = a.plot(pose.x, pose.y, 'b.') # Returns a tuple of line objects, thus the comma
+# Plot heading
+heading1, = a.plot([pose.x, pose.x+unit*math.cos(pose.theta *(math.pi/180))], \
+	[pose.y, pose.y+unit*math.sin(pose.theta *(math.pi/180))])
+
+# line3, = b.plot(pose.x, pose.y, 'g.') # Returns a tuple of line objects, thus the comma
+# line4, = c.plot(pose.x, pose.y, 'r.') # Returns a tuple of line objects, thus the comma
+# line5, = d.plot(pose.x, pose.y, 'y.') # Returns a tuple of line objects, thus the comma
 
 
-def update_plot(pose, encoder, IMU, desired):
+
+
+def update_plot(pose):
 	# Update paths
 	pathx.append(pose.x)
 	pathy.append(pose.y)
-	pathx_des.append(desired.x)
-	pathy_des.append(desired.y)
-	pathx_enc.append(encoder.x)
-	pathy_enc.append(encoder.y)
-	pathx_IMU.append(IMU.x)
-	pathy_IMU.append(IMU.y)
+	# pathx_des.append(desired.x)
+	# pathy_des.append(desired.y)
+	# pathx_enc.append(encoder.x)
+	# pathy_enc.append(encoder.y)
+	# pathx_IMU.append(IMU.x)
+	# pathy_IMU.append(IMU.y)
 
 def updata_plot_img(pose):
 	pathx.append(pose.x)
@@ -51,31 +77,37 @@ def updata_plot_img(pose):
 		
 
 
-def draw_plot(pose, encoder, IMU, desired):
+def draw_plot(pose):
 	
 	# Update data
 	line1.set_xdata(pose.x)
 	line1.set_ydata(pose.y)
 	line2.set_xdata(pathx)
 	line2.set_ydata(pathy)
-	line3.set_xdata(pathx_enc)
-	line3.set_ydata(pathy_enc)
-	line4.set_xdata(pathx_IMU)
-	line4.set_ydata(pathy_IMU)
-	line5.set_xdata(pathx_des)
-	line5.set_ydata(pathy_des)
-
-	# Plot heading
-	heading1, = ax.plot([pose.x, pose.x+unit*math.cos(pose.theta *(math.pi/180))], \
-		[pose.y, pose.y+unit*math.sin(pose.theta *(math.pi/180))])
-	heading3, = ax.plot([encoder.x, encoder.x+unit*math.cos(encoder.theta *(math.pi/180))], \
-		[encoder.y, encoder.y+unit*math.sin(encoder.theta *(math.pi/180))])
-	heading4, = ax.plot([IMU.x, IMU.x+unit*math.cos(IMU.theta *(math.pi/180))], \
-		[IMU.y, IMU.y+unit*math.sin(IMU.theta *(math.pi/180))])
-	heading5, = ax.plot([desired.x, desired.x+unit*math.cos(desired.theta *(math.pi/180))], \
-		[desired.y, desired.y+unit*math.sin(desired.theta *(math.pi/180))])
+	heading1.set_xdata([pose.x, pose.x+unit*math.cos(pose.theta *(math.pi/180))])
+	heading1.set_ydata([pose.y, pose.y+unit*math.sin(pose.theta *(math.pi/180))])
 
 	# Draw
 	fig.canvas.draw()
 	fig.canvas.flush_events()
 
+
+
+
+
+
+# line3.set_xdata(pathx_enc)
+	# line3.set_ydata(pathy_enc)
+	# line4.set_xdata(pathx_IMU)
+	# line4.set_ydata(pathy_IMU)
+	# line5.set_xdata(pathx_des)
+	# line5.set_ydata(pathy_des)
+
+
+	
+	# heading3, = b.plot([encoder.x, encoder.x+unit*math.cos(encoder.theta *(math.pi/180))], \
+	# 	[encoder.y, encoder.y+unit*math.sin(encoder.theta *(math.pi/180))])
+	# heading4, = c.plot([IMU.x, IMU.x+unit*math.cos(IMU.theta *(math.pi/180))], \
+	# 	[IMU.y, IMU.y+unit*math.sin(IMU.theta *(math.pi/180))])
+	# heading5, = d.plot([desired.x, desired.x+unit*math.cos(desired.theta *(math.pi/180))], \
+	# 	[desired.y, desired.y+unit*math.sin(desired.theta *(math.pi/180))])
