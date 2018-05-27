@@ -12,7 +12,7 @@ trust_value_imu_omega = 1.0
 trust_value_encoder_omega = 0.0
 trust_value_desired_omega =  0.0
 
-a = 4.8
+a = 4.05
 
 def map_encoder(state):
 

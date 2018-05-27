@@ -28,6 +28,7 @@ def sendToArduino(sendStr):
     sendStr = sendStr + checksum_c
     ArduinoSer.write(sendStr.encode())
 
+
 def recvFromArduino():
     global startMarker, endMarker, ArduinoSer
 

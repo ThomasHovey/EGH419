@@ -23,10 +23,10 @@ pathy_img = []
 pose = Pose(0,0,0,0,0,0)
 
 #Set limits
-yneg = -50
-ypos = 300
-xneg = -50
-xpos = 300
+yneg = -100
+ypos = 400
+xneg = -100
+xpos = 400
 # Setup plot
 plt.ion()
 fig = plt.figure()

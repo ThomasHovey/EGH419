@@ -10,6 +10,7 @@ from modules.classes.State import State
 import modules.plotting as plotting
 import modules.comm as comm
 import modules.localization as localization
+import modules.nav as nav
 import matplotlib.pyplot as plt
 import math
 
@@ -21,15 +22,16 @@ state = State()
 # Init serial to arduino
 comm.Serial_init()
 
-# Set motor speeds
-state.LeftMotorSpeed = 30
-state.RightMotorSpeed = 30
-comm.setMotorSpeed(state)
 
+
+##################
+# Move to (300,0)
+##################
+
+desired_pos = Pose(300,0,0,0,0,0)
 # Loop
 old_time = time.time()
-i = 0
-while state.Pose.x < 200 :
+while state.Pose.x < 300 :
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
@@ -40,11 +42,11 @@ while state.Pose.x < 200 :
 
 	# Update plot
 	plotting.update_plot(state.Pose)
-	if i == 5:
-		plotting.draw_plot(state.Pose)
-		i = 0
+	
+	# Get motor speeds and update
+	nav.moveToPoint(state, desired_pos)
+	comm.setMotorSpeed(state)
 
-	i += 1
 
 # Stop
 state.LeftMotorSpeed = 0
@@ -55,16 +57,14 @@ comm.setMotorSpeed(state)
 plotting.draw_plot(state.Pose)
 
 
-# Set motor speeds
-state.LeftMotorSpeed = -13
-state.RightMotorSpeed = 13
-comm.setMotorSpeed(state)
+##################
+# Move to (300,300)
+##################
 
+desired_pos = Pose(300,300,0,0,0,0)
 # Loop
 old_time = time.time()
-i = 0
-while state.Pose.theta < 90 or state.Pose.theta > 200 :
-	print(state.Pose.theta)
+while state.Pose.y < 300 :
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
@@ -75,11 +75,11 @@ while state.Pose.theta < 90 or state.Pose.theta > 200 :
 
 	# Update plot
 	plotting.update_plot(state.Pose)
-	if i == 5:
-		plotting.draw_plot(state.Pose)
-		i = 0
+	
+	# Get motor speeds and update
+	nav.moveToPoint(state, desired_pos)
+	comm.setMotorSpeed(state)
 
-	i += 1
 
 # Stop
 state.LeftMotorSpeed = 0
@@ -89,15 +89,14 @@ comm.setMotorSpeed(state)
 # Draw Plot
 plotting.draw_plot(state.Pose)
 
-# Set motor speeds
-state.LeftMotorSpeed = 25
-state.RightMotorSpeed = 25
-comm.setMotorSpeed(state)
+##################
+# Move to (0,300)
+##################
 
+desired_pos = Pose(0,300,0,0,0,0)
 # Loop
 old_time = time.time()
-i = 0
-while state.Pose.y < 200 :
+while state.Pose.x > 0 :
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
@@ -108,11 +107,11 @@ while state.Pose.y < 200 :
 
 	# Update plot
 	plotting.update_plot(state.Pose)
-	if i == 5:
-		plotting.draw_plot(state.Pose)
-		i = 0
+	
+	# Get motor speeds and update
+	nav.moveToPoint(state, desired_pos)
+	comm.setMotorSpeed(state)
 
-	i += 1
 
 # Stop
 state.LeftMotorSpeed = 0
@@ -122,6 +121,67 @@ comm.setMotorSpeed(state)
 # Draw Plot
 plotting.draw_plot(state.Pose)
 
+##################
+# Move to (0,0)
+##################
+
+desired_pos = Pose(0,0,0,0,0,0)
+# Loop
+old_time = time.time()
+while state.Pose.y > 0 :
+	# Read encoder data ect
+	comm.updateData(state)
+	# Find time 
+	state.Time = time.time() - old_time
+	old_time = time.time()
+	# Update localization
+	localization.update(state)
+
+	# Update plot
+	plotting.update_plot(state.Pose)
+	
+	# Get motor speeds and update
+	nav.moveToPoint(state, desired_pos)
+	comm.setMotorSpeed(state)
+
+# Stop
+state.LeftMotorSpeed = 0
+state.RightMotorSpeed = 0
+comm.setMotorSpeed(state)
+
+# Draw Plot
+plotting.draw_plot(state.Pose)
+
+##################
+# Move to (300,300)
+##################
+
+desired_pos = Pose(300,300,0,0,0,0)
+# Loop
+old_time = time.time()
+while state.Pose.x < 300 :
+	# Read encoder data ect
+	comm.updateData(state)
+	# Find time 
+	state.Time = time.time() - old_time
+	old_time = time.time()
+	# Update localization
+	localization.update(state)
+
+	# Update plot
+	plotting.update_plot(state.Pose)
+	
+	# Get motor speeds and update
+	nav.moveToPoint(state, desired_pos)
+	comm.setMotorSpeed(state)
+
+# Stop
+state.LeftMotorSpeed = 0
+state.RightMotorSpeed = 0
+comm.setMotorSpeed(state)
+
+# Draw Plot
+plotting.draw_plot(state.Pose)
 
 print('X')
 print(state.Pose.x)
