@@ -5,9 +5,13 @@ import math
 
 
 WIDTH = 1.585
-trust_value_imu = 1.0
-trust_value_encoder = 0.0
+trust_value_imu = 0.0
+trust_value_encoder = 1.0
 trust_value_desired =  0.0
+trust_value_imu_omega = 1.0
+trust_value_encoder_omega = 0.0
+trust_value_desired_omega =  0.0
+
 a = 4.8
 
 def map_encoder(state):
@@ -90,13 +94,13 @@ def update(state):
 	pose = Pose(0,0,0,0,0,0)
 	
 	# Perform weighting and divided by 3 to get an average
-	pose.omega = ((encoder_vel.omega * trust_value_encoder) + (IMU_vel.omega * trust_value_imu) + (desired_vel.omega * trust_value_desired))
+	pose.omega = ((encoder_vel.omega * trust_value_encoder_omega) + (IMU_vel.omega * trust_value_imu_omega) + (desired_vel.omega * trust_value_desired_omega))
 	
 	pose.x_vel = ((encoder_vel.x_vel * trust_value_encoder) + (IMU_vel.x_vel * trust_value_imu) + (desired_vel.x_vel * trust_value_desired))
 	
 	pose.y_vel = ((encoder_vel.y_vel * trust_value_encoder) + (IMU_vel.y_vel * trust_value_imu) + (desired_vel.y_vel * trust_value_desired))
 	
-
+	
 
 	# Get position according to the encoders
 	# Old position plus the new change in position to achieve new position
@@ -111,13 +115,13 @@ def update(state):
 	encoder_vel.y = state.Pose.y + encoder_vel.y_vel * state.Time
 	
 
-	# Get position according to the encoders
+	# Get position according to the IMU
 	# Old position plus the new change in position to achieve new position
 	IMU_vel.theta = state.Pose.theta + IMU_vel.omega * state.Time
 	IMU_vel.x = state.Pose.x + IMU_vel.x_vel * state.Time
 	IMU_vel.y = state.Pose.y + IMU_vel.y_vel * state.Time
 	
-	# Get position according to the encoders
+	# Get position according to the desired velocity
 	# Old position plus the new change in position to achieve new position
 	desired_vel.theta = state.Pose.theta + desired_vel.omega * state.Time
 	desired_vel.x = state.Pose.x + desired_vel.x_vel * state.Time
@@ -128,7 +132,36 @@ def update(state):
 	
 	
 	return encoder_vel,IMU_vel,desired_vel
+	
+	
+# def prediction(state, place_recog)
 
+# 	# reference: https://en.wikipedia.org/wiki/Kalman_filter#Extended_Kalman_filter
+	
+	
+# 	locali = [ pose.x_vel ; pose.y_vel ; pose.omega ]
+# 	place_recog = [ pose.x_vel ; pose.y_vel ; pose.omega ]
+# 	desired = [ pose.x_vel ; pose.y_vel ; pose.omega ]
+# 	estimate_c = 
+	
+# 	#Predicted (a priori) state estimate
+# 	#Predicted (a priori) estimate covariance
+	
+	
+	
+# 	yk = place_recog - (locali * desired) # Innovation or measurement pre-fit residual
+# 	sk = desired * estimate_c * np.transpose(desired)# Innovation (or pre-fit residual) covariance
+# 	kk = estimate_c * np.transpose(desired) * sk^-1 # Optimal Kalman gain
+# 	xk = locali + kk * yk # Updated (a posteriori) state estimate 
+# 	pk = (kk * desired)estimate_c - 1 np.transpose(kk * desired) + kk * np.transpose(kk) # Updated (a posteriori) estimate covariance
+# 	ykk = desired * xk # Measurement post-fit residual
+
+	
+	
+# 	state.pose
+	
+	
+	
 
 
 	

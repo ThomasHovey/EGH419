@@ -67,7 +67,7 @@ state.RightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Finalize databse
-database = place_recog.database_finalize()
+place_recog.database_finalize()
 
 
 # Move backwards until intial position reached
@@ -100,7 +100,7 @@ while i < 50:
 	fig.canvas.flush_events()
 	i += 1
 	# Check position for start
-	new_pose, error = place_recog.find_location(database, state.Pose)
+	new_pose, error = place_recog.find_location(state.Pose)
 	
 	if new_pose.x == 0 and new_pose.y == 0:
 		print("Back at start - shutting down")

@@ -48,7 +48,7 @@ def get_img():
 
 
 
-def find_location(database, pose):
+def find_location(pose):
 	# Search the data base for images that are close to the current estimated location
 	img = get_img()
 	database_temp = []
@@ -96,12 +96,11 @@ def database_append(state):
 
 def database_finalize():
 	np.save('modules/data/database.npy',database)
-	return database
+	
 
 def load_database():
 	database = np.load('modules/data/database.npy')
 	#database.toList()
-	return database
 
 
 # # Build database

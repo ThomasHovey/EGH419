@@ -1,7 +1,7 @@
-#import cv2
+import cv2
 import numpy as np
-#from picamera.array import PiRGBArray
-#from picamera import PiCamera 
+from picamera.array import PiRGBArray
+from picamera import PiCamera 
 import time
 import modules.place_recog as place_recog
 from modules.classes.Pose import Pose
@@ -13,6 +13,7 @@ import modules.localization as localization
 import matplotlib.pyplot as plt
 import math
 
+# Pause
 time.sleep(0.1)
 
 # Init state
@@ -22,15 +23,22 @@ state = State()
 comm.Serial_init()
 plotting.init_plot()
 
-# Set motor speeds
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
-comm.setMotorSpeed(state)
+# Chose mode
+text = raw_input("Build database or load existing? (load or build)")  # Python 2
+
+if text == "build"
+		place_recog.make_database(state)
+
+else :
+	place_recog.load_database()
+
+text = raw_input("Ready to start mowing?")
 
 # Loop
 old_time = time.time()
-i = 0
-while i < 100:
+while 1:
+
+	
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
@@ -51,14 +59,3 @@ comm.setMotorSpeed(state)
 
 # Draw Plot
 plotting.draw_plot(state.Pose, encoder, IMU, desired)
-
-print("X")
-print(state.Pose.x)
-print("Y")
-print(state.Pose.y)
-print("Theta")
-print(state.Pose.theta)
-
-
-while(1):
-	time.sleep(1)
