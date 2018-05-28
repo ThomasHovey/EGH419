@@ -17,8 +17,8 @@ a = 4.05
 def map_encoder(state):
 
 	# Get l and r velocities
-	Vr = a*(state.RightDistance)/state.Time
-	Vl = a*(state.LeftDistance)/state.Time
+	Vr = a*(state.rightDistance)/state.time
+	Vl = a*(state.leftDistance)/state.time
 
 	# Get angular velocity
 	omega = (Vr - Vl)/WIDTH
@@ -31,8 +31,8 @@ def map_encoder(state):
 
 	# Calculate new positions
 	pose.omega = omega
-	pose.x_vel = V*math.cos((state.Pose.theta +omega*state.Time)*(math.pi/180))
-	pose.y_vel = V*math.sin((state.Pose.theta +omega*state.Time)*(math.pi/180))
+	pose.x_vel = V*math.cos((state.pose.theta +omega*state.time)*(math.pi/180))
+	pose.y_vel = V*math.sin((state.pose.theta +omega*state.time)*(math.pi/180))
 
 	return pose
 
@@ -54,14 +54,14 @@ def map_IMU_data(state):
 
 	#Intergrate these 3 values ^ over time  to find these values  
 	pose.omega = z_gyro  # intergrate z_gyro over time
-	pose.x_vel =  state.Pose.x_vel + x_accel * state.Time # intergrate x_accel to get x_vel
-	pose.y_vel =  state.Pose.y_vel + y_accel * state.Time #intergrate y_accel to get y_vel
+	pose.x_vel =  state.pose.x_vel + x_accel * state.time # intergrate x_accel to get x_vel
+	pose.y_vel =  state.pose.y_vel + y_accel * state.time #intergrate y_accel to get y_vel
 
 	return pose
 
 def get_desired_vel(state):
-	Vr =state.RightMotorSpeed*a
-	Vl =state.LeftMotorSpeed*a
+	Vr =state.rightMotorSpeed*a
+	Vl =state.leftMotorSpeed*a
 	
 	# Angular Velocity
 	omega = (Vr - Vl)/WIDTH
@@ -75,8 +75,8 @@ def get_desired_vel(state):
 	# Calculate new positions
 	pose.omega = omega
 	# The old heading Plus the new change in angular velocity times by time to achieve new heading  
-	pose.x_vel = V*math.cos((state.Pose.theta +omega*state.Time)*(math.pi/180))
-	pose.y_vel = V*math.sin((state.Pose.theta +omega*state.Time)*(math.pi/180))
+	pose.x_vel = V*math.cos((state.pose.theta +omega*state.time)*(math.pi/180))
+	pose.y_vel = V*math.sin((state.pose.theta +omega*state.time)*(math.pi/180))
 	
 	return pose
 	
@@ -104,35 +104,35 @@ def update(state):
 
 	# Get position according to the encoders
 	# Old position plus the new change in position to achieve new position
-	pose.theta = state.Pose.theta + pose.omega * state.Time
+	pose.theta = state.pose.theta + pose.omega * state.time
 	if pose.theta < 0:
 		pose.theta = pose.theta + 360
 	elif pose.theta > 360:
 		pose.theta = pose.theta - 360
-	pose.x = state.Pose.x + pose.x_vel * state.Time
-	pose.y = state.Pose.y + pose.y_vel * state.Time
+	pose.x = state.pose.x + pose.x_vel * state.time
+	pose.y = state.pose.y + pose.y_vel * state.time
 	
 	# # Get position according to the encoders
 	# # Old position plus the new change in position to achieve new position
-	# encoder_vel.theta = state.Pose.theta + encoder_vel.omega * state.Time
-	# encoder_vel.x = state.Pose.x + encoder_vel.x_vel * state.Time
-	# encoder_vel.y = state.Pose.y + encoder_vel.y_vel * state.Time
+	# encoder_vel.theta = state.pose.theta + encoder_vel.omega * state.time
+	# encoder_vel.x = state.pose.x + encoder_vel.x_vel * state.time
+	# encoder_vel.y = state.pose.y + encoder_vel.y_vel * state.time
 	
 
 	# # Get position according to the IMU
 	# # Old position plus the new change in position to achieve new position
-	# IMU_vel.theta = state.Pose.theta + IMU_vel.omega * state.Time
-	# IMU_vel.x = state.Pose.x + IMU_vel.x_vel * state.Time
-	# IMU_vel.y = state.Pose.y + IMU_vel.y_vel * state.Time
+	# IMU_vel.theta = state.pose.theta + IMU_vel.omega * state.time
+	# IMU_vel.x = state.pose.x + IMU_vel.x_vel * state.time
+	# IMU_vel.y = state.pose.y + IMU_vel.y_vel * state.time
 	
 	# # Get position according to the desired velocity
 	# # Old position plus the new change in position to achieve new position
-	# desired_vel.theta = state.Pose.theta + desired_vel.omega * state.Time
-	# desired_vel.x = state.Pose.x + desired_vel.x_vel * state.Time
-	# desired_vel.y = state.Pose.y + desired_vel.y_vel * state.Time
+	# desired_vel.theta = state.pose.theta + desired_vel.omega * state.time
+	# desired_vel.x = state.pose.x + desired_vel.x_vel * state.time
+	# desired_vel.y = state.pose.y + desired_vel.y_vel * state.time
 
 
-	state.Pose = pose
+	state.pose = pose
 	
 	
 	# return encoder_vel,IMU_vel,desired_vel

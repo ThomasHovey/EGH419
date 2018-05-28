@@ -75,7 +75,7 @@ def waitForArduino():
         msg,cs_error = recvFromArduino()
         print(msg)
         
-def updateData(State):
+def updateData(state):
     cmdData = []
     cmdData.append("<IMU:>")
     cmdData.append("<ECD:>")
@@ -131,8 +131,8 @@ def updateData(State):
                 try:
                     split_data = dataRecvd.split(" ")
                     L_Encoder,R_Encoder = split_data
-                    State.LeftDistance = float(L_Encoder)/5.456 # in mm, 5.456 is counts/mm constance
-                    State.RightDistance = float(R_Encoder)/5.456 # in mm, 5.456 is counts/mm constance
+                    state.leftDistance = float(L_Encoder)/5.456 # in mm, 5.456 is counts/mm constance
+                    state.rightDistance = float(R_Encoder)/5.456 # in mm, 5.456 is counts/mm constance
                 except ValueError as error:
                     print("[WARNING] Arduino returned invalid ECD data, state elements unchanged.")
                     print("Data received: " + dataRecvd)
@@ -146,7 +146,7 @@ def updateData(State):
                     #Gyr_x = float(Gx)*4.375/1000 # in dps, 4.375 is scale factor
                     #Gyr_y = float(Gy)*4.375/1000 # in dps, 4.375 is scale factor
                     Gyr_z = float(Gz)*8.75/1000 - z_offset# in dps, 4.375 is scale factor 
-                    State.IMU = IMU(Acc_x,Acc_y,Gyr_z)
+                    state.IMU = IMU(Acc_x,Acc_y,Gyr_z)
                 except ValueError as error:
                     print("[WARNING] Arduino returned invalid IMU data, state elements unchanged.")
                     print("Data received: " + dataRecvd)
@@ -157,16 +157,16 @@ def updateData(State):
                     Mag_x = float(Mx)/6842 # in gauss, 6842 is scale factor
                     Mag_y = float(My)/6842 # in gauss, 6842 is scale factor
                     Mag_z = float(Mz)/6842 # in gauss, 6842 is scale factor  
-                    State.Compass = Compass(Mag_x,Mag_y,Mag_z)
+                    state.compass = Compass(Mag_x,Mag_y,Mag_z)
                 except ValueError as error:
                     print("[WARNING] Arduino returned invalid Compass data, state elements unchanged.")
                     print("Data received: " + dataRecvd)
             n += 1
-    return State
+    return state
     
-def setMotorSpeed(State):
-    ML = State.LeftMotorSpeed
-    MR = State.RightMotorSpeed
+def setMotorSpeed(state):
+    ML = state.leftMotorSpeed
+    MR = state.rightMotorSpeed
     SENT_SPEED = "<MoSp:" + str(ML) + "," + str(MR) + ">"
     if abs(ML)>140 or abs(MR)>140:
         print("[ERROR] Maximum speed allowed is 140, please reduce the speed!")

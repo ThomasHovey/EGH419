@@ -13,6 +13,13 @@ import modules.localization as localization
 import matplotlib.pyplot as plt
 import math
 
+# teleop constant
+FORWARD = 'w'
+LEFT = 'a'
+RIGHT = 'd'
+REVERSE = 's'
+FINISH = 'f'
+
 # Pause
 time.sleep(0.1)
 
@@ -23,38 +30,115 @@ state = State()
 comm.Serial_init()
 
 # Chose mode
-text = raw_input("Build database or load existing? (load or build)")  # Python 2
+text = raw_input("Build database or load existing? (l or b)")  # Python 2
 
-if text == "build"
-		place_recog.make_database(state)
+if text == "b":
+	# Teleop
+	char = raw_input("Drive robot (wasd, f to finalize)")
+
+	# Loop
+	old_time = time.time()
+	while char != FINISH:
+		# Read encoder data ect
+		comm.updateData(state)
+		# Find time 
+		state.time = time.time() - old_time
+		old_time = time.time()
+		# Update localization
+		localization.update(state)
+
+		# Add img to database
+		place_recog.database_append(state)
+
+		# Update plot
+		plotting.update_plot(state.Pose)
+		
+		# Get motor speeds from teleop
+		if char == FORWARD:
+			state.leftMotorSpeed = 25
+			state.rightMotorSpeed = 25
+		elif char == REVERSE:
+			state.leftMotorSpeed = -25
+			state.rightMotorSpeed = -25
+		elif char == LEFT:
+			state.leftMotorSpeed = -20
+			state.rightMotorSpeed = 20
+
+		elif char == RIGHT:
+			state.leftMotorSpeed = 20
+			state.rightMotorSpeed = -20
+
+		else:
+			state.leftMotorSpeed = 0
+			state.rightMotorSpeed = 0
+
+		
+		comm.setMotorSpeed(state)
+
+		char = raw_input()
+
+	# Stop motor
+	state.leftMotorSpeed = 0
+	state.rightMotorSpeed = 0
+		
+	comm.setMotorSpeed(state)
+
+	# Finalize database
+	database = place_recog.database_finalize()
 
 else :
-	place_recog.load_database()
+	database = place_recog.load_database()
 
+
+# Plot database locations
+plotting.add_database(database)
+plotting.draw_plot()
+
+
+## Now database is loaded 
 text = raw_input("Ready to start mowing?")
 
 # Loop
 old_time = time.time()
-while 1:
 
+# Set target
+target_pose = database[len(database)/2].pose
+	
+i=0
+
+while state.pose.x != target_pose.x or state.pose.y != target_pose.y:
 	
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
-	state.Time = time.time() - old_time
+	state.time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
-	encoder,IMU,desired = localization.update(state)
+	localization.update(state)
 
 	# Update plot
-	plotting.update_plot(state.Pose, encoder, IMU, desired)
+	plotting.update_plot(state.pose)
+	
+	# Check place recognition
+	pose, error = place_recog.find_location()
+	if error != 'NULL'
+		plotting.add_img_found(pose,error)
+		state.pose.x = pose.x
+		state.pose.y = pose.y
+	else:
+		print("No image matched")
 
-	i += 1
+	# Get motor speeds and update
+	nav.moveToPoint(state, target_pose)
+	comm.setMotorSpeed(state)
+	if i == 10:
+		plotting.draw_plot(state.pose)
+
 
 # Stop
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.Pose, encoder, IMU, desired)
+plotting.draw_plot(state.pose)

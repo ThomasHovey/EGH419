@@ -6,19 +6,13 @@ import matplotlib.pyplot as plt
 import math
 
 # Setup length of line for bearing
-unit = 10
+unit = 15
 
 # Create path list
 pathx = []
 pathy = []
-pathx_enc = []
-pathy_enc = []
-pathx_IMU = []
-pathy_IMU = []
-pathx_des = []
-pathy_des = []
-pathx_img = []
-pathy_img = []
+pathx_boundary = []
+pathy_boundary = []
 
 pose = Pose(0,0,0,0,0,0)
 
@@ -34,42 +28,22 @@ a = fig.add_subplot(111)
 # Set limit
 plt.ylim(yneg,ypos)
 plt.xlim(xneg,xpos)
-# b = fig.add_subplot(222)
-# # Set limit
-# plt.ylim(yneg,ypos)
-# plt.xlim(xneg,xpos)
-# c = fig.add_subplot(223)
-# # Set limit
-# plt.ylim(yneg,ypos)
-# plt.xlim(xneg,xpos)
-# d = fig.add_subplot(224)
-# # Set limit
-# plt.ylim(yneg,ypos)
-# plt.xlim(xneg,xpos)
 
-line1, = a.plot(pose.x, pose.y, 'r+') # Returns a tuple of line objects, thus the comma
-line2, = a.plot(pose.x, pose.y, 'b.') # Returns a tuple of line objects, thus the comma
+line_boundary, = a.plot(pose.x, pose.y, 'r+') # Returns a tuple of line objects, thus the comma
+line_path, = a.plot(pose.x, pose.y, 'b.') # Returns a tuple of line objects, thus the comma
 # Plot heading
-heading1, = a.plot([pose.x, pose.x+unit*math.cos(pose.theta *(math.pi/180))], \
+heading, = a.plot([pose.x, pose.x+unit*math.cos(pose.theta *(math.pi/180))], \
 	[pose.y, pose.y+unit*math.sin(pose.theta *(math.pi/180))])
 
-# line3, = b.plot(pose.x, pose.y, 'g.') # Returns a tuple of line objects, thus the comma
-# line4, = c.plot(pose.x, pose.y, 'r.') # Returns a tuple of line objects, thus the comma
-# line5, = d.plot(pose.x, pose.y, 'y.') # Returns a tuple of line objects, thus the comma
-
-
-
+def add_database(database):
+	for i in database:
+		pathx_boundary.append(database[i].pose.x)
+		pathy_boundary.append(database[i].pose.y)
 
 def update_plot(pose):
 	# Update paths
 	pathx.append(pose.x)
 	pathy.append(pose.y)
-	# pathx_des.append(desired.x)
-	# pathy_des.append(desired.y)
-	# pathx_enc.append(encoder.x)
-	# pathy_enc.append(encoder.y)
-	# pathx_IMU.append(IMU.x)
-	# pathy_IMU.append(IMU.y)
 
 def updata_plot_img(pose):
 	pathx.append(pose.x)
@@ -80,12 +54,12 @@ def updata_plot_img(pose):
 def draw_plot(pose):
 	
 	# Update data
-	line1.set_xdata(pose.x)
-	line1.set_ydata(pose.y)
-	line2.set_xdata(pathx)
-	line2.set_ydata(pathy)
-	heading1.set_xdata([pose.x, pose.x+unit*math.cos(pose.theta *(math.pi/180))])
-	heading1.set_ydata([pose.y, pose.y+unit*math.sin(pose.theta *(math.pi/180))])
+	line_boundary.set_xdata(pathx_boundary)
+	line_boundary.set_ydata(pathy_boundary)
+	line_path.set_xdata(pathx)
+	line_path.set_ydata(pathy)
+	heading.set_xdata([pose.x, pose.x+unit*math.cos(pose.theta *(math.pi/180))])
+	heading.set_ydata([pose.y, pose.y+unit*math.sin(pose.theta *(math.pi/180))])
 
 	# Draw
 	fig.canvas.draw()
@@ -94,7 +68,9 @@ def draw_plot(pose):
 
 
 
-
+########################
+# dead code
+########################
 
 # line3.set_xdata(pathx_enc)
 	# line3.set_ydata(pathy_enc)

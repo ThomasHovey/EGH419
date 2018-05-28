@@ -4,10 +4,10 @@ from IMU import IMU
 class State:
 
 	def __init__(self, ):
-		self.LeftMotorSpeed = 0
-		self.RightMotorSpeed = 0
-		self.LeftDistance = 0
-		self.RightDistance = 0
+		self.leftMotorSpeed = 0
+		self.rightMotorSpeed = 0
+		self.leftDistance = 0
+		self.rightDistance = 0
 		self.IMU = IMU(0,0,0)
-		self.Pose = Pose(0,0,0,0,0,0)
-		self.Time = 0
+		self.pose = Pose(0,0,0,0,0,0)
+		self.time = 0

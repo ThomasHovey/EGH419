@@ -22,8 +22,8 @@ state = State()
 comm.Serial_init()
 
 # Set motor speeds
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Loop
@@ -33,25 +33,25 @@ while 1:
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
-	state.Time = time.time() - old_time
+	state.time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
 	localization.update(state)
 
 	# Update plot
-	plotting.update_plot(state.Pose)
+	plotting.update_plot(state.pose)
 	if i == 5:
-		plotting.draw_plot(state.Pose)
+		plotting.draw_plot(state.pose)
 		i = 0
 
 
 	i += 1
 
 # Stop
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.Pose)
+plotting.draw_plot(state.pose)
 

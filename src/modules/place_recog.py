@@ -8,8 +8,8 @@ from classes.ImageData import ImageData
 from classes.State import State
 
 # Tuning Constants
-POSE_TOLERANCE = 1000
-
+POSE_TOLERANCE = 100
+ERROR_THRESHOLD = 10.0
 # Empty database
 database = []
 
@@ -57,27 +57,42 @@ def find_location(pose):
 		and (pose.y - data.pose.y < POSE_TOLERANCE and pose.y - data.pose.y > -POSE_TOLERANCE):
 			database_temp.append(data)
 	database_temp = database
-	# Search the close images for one that matches our location
-	error_database = []
-	for data in database_temp:
-		img_diff = abs(img.astype(int) - data.img.astype(int))
-		img_diff = np.array(img_diff,dtype = np.uint8)
-		
-		error = np.mean(img_diff)
-		error_database.append((error, data.pose))
-
-		im_stack = np.vstack((data.img,img))
-		im_stack = np.vstack((im_stack, img_diff))
-		cv2.imshow("Database img, current image, difference", im_stack)
-		#print("Error is " + str(error))	
-		cv2.waitKey(10)
-	# Use the pose with the lowest error
 	
-	# cv2.destroyAllWindows()
-	error_database.sort(key=lambda tup: tup[0])
-	return (error_database[0][1], error_database[0][0])
+	# Return null if not close to boundary
+	if database_temp == []:
+		return Pose(0,0,0,0,0,0), 'NULL'
 
-def build_database():
+	# Check database	
+	else:
+		# Search the close images for one that matches our location
+		error_database = []
+		for data in database_temp:
+			# Get the difference
+			img_diff = abs(img.astype(int) - data.img.astype(int))
+			img_diff = np.array(img_diff,dtype = np.uint8)
+			
+			# Find the avg error
+			error = np.mean(img_diff)
+
+			# Check if error is below threshold
+			if error < ERROR_THRESHOLD:
+				error_database.append((error, data.pose))
+
+			im_stack = np.vstack((data.img,img))
+			im_stack = np.vstack((im_stack, img_diff))
+			cv2.imshow("Database img, current image, difference", im_stack)
+			#print("Error is " + str(error))	
+			cv2.waitKey(1)
+
+		# Return null if no matches
+		if error_database == []:
+			return Pose(0,0,0,0,0,0), 'NULL'
+		# Else return best match
+		else:
+			error_database.sort(key=lambda tup: tup[0])
+			return (error_database[0][1], error_database[0][0])
+
+def build_database_old():
 	database = []
 	while 1:
 		key = raw_input("Enter pose x value (press e to finish)")
@@ -91,16 +106,18 @@ def build_database():
 
 def database_append(state):
 	capture = get_img()
-	database.append(ImageData(capture,state.Pose))
+	database.append(ImageData(capture,state.pose))
 	#cv2.imwrite('img.png',capture)
 
 def database_finalize():
 	np.save('modules/data/database.npy',database)
+	return database
 	
 
 def load_database():
 	database = np.load('modules/data/database.npy')
-	#database.toList()
+	return database
+
 
 
 # # Build database

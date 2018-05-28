@@ -31,17 +31,17 @@ comm.Serial_init()
 desired_pos = Pose(300,0,0,0,0,0)
 # Loop
 old_time = time.time()
-while state.Pose.x < 300 :
+while state.pose.x < 300 :
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
-	state.Time = time.time() - old_time
+	state.time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
 	localization.update(state)
 
 	# Update plot
-	plotting.update_plot(state.Pose)
+	plotting.update_plot(state.pose)
 	
 	# Get motor speeds and update
 	nav.moveToPoint(state, desired_pos)
@@ -49,12 +49,12 @@ while state.Pose.x < 300 :
 
 
 # Stop
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.Pose)
+plotting.draw_plot(state.pose)
 
 
 ##################
@@ -64,17 +64,17 @@ plotting.draw_plot(state.Pose)
 desired_pos = Pose(300,300,0,0,0,0)
 # Loop
 old_time = time.time()
-while state.Pose.y < 300 :
+while state.pose.y < 300 :
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
-	state.Time = time.time() - old_time
+	state.time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
 	localization.update(state)
 
 	# Update plot
-	plotting.update_plot(state.Pose)
+	plotting.update_plot(state.pose)
 	
 	# Get motor speeds and update
 	nav.moveToPoint(state, desired_pos)
@@ -82,12 +82,12 @@ while state.Pose.y < 300 :
 
 
 # Stop
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.Pose)
+plotting.draw_plot(state.pose)
 
 ##################
 # Move to (0,300)
@@ -96,17 +96,17 @@ plotting.draw_plot(state.Pose)
 desired_pos = Pose(0,300,0,0,0,0)
 # Loop
 old_time = time.time()
-while state.Pose.x > 0 :
+while state.pose.x > 0 :
 	# Read encoder data ect
-	comm.updateData(state)
+	comm.updateData(state)	
 	# Find time 
-	state.Time = time.time() - old_time
+	state.time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
 	localization.update(state)
 
 	# Update plot
-	plotting.update_plot(state.Pose)
+	plotting.update_plot(state.pose)
 	
 	# Get motor speeds and update
 	nav.moveToPoint(state, desired_pos)
@@ -114,12 +114,12 @@ while state.Pose.x > 0 :
 
 
 # Stop
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.Pose)
+plotting.draw_plot(state.pose)
 
 ##################
 # Move to (0,0)
@@ -128,29 +128,29 @@ plotting.draw_plot(state.Pose)
 desired_pos = Pose(0,0,0,0,0,0)
 # Loop
 old_time = time.time()
-while state.Pose.y > 0 :
+while state.pose.y > 0 :
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
-	state.Time = time.time() - old_time
+	state.time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
 	localization.update(state)
 
 	# Update plot
-	plotting.update_plot(state.Pose)
+	plotting.update_plot(state.pose)
 	
 	# Get motor speeds and update
 	nav.moveToPoint(state, desired_pos)
 	comm.setMotorSpeed(state)
 
 # Stop
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.Pose)
+plotting.draw_plot(state.pose)
 
 ##################
 # Move to (300,300)
@@ -159,37 +159,37 @@ plotting.draw_plot(state.Pose)
 desired_pos = Pose(300,300,0,0,0,0)
 # Loop
 old_time = time.time()
-while state.Pose.x < 300 :
+while state.pose.x < 300 :
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
-	state.Time = time.time() - old_time
+	state.time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
 	localization.update(state)
 
 	# Update plot
-	plotting.update_plot(state.Pose)
+	plotting.update_plot(state.pose)
 	
 	# Get motor speeds and update
 	nav.moveToPoint(state, desired_pos)
 	comm.setMotorSpeed(state)
 
 # Stop
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.Pose)
+plotting.draw_plot(state.pose)
 
 print('X')
-print(state.Pose.x)
+print(state.pose.x)
 
 print('Y')
-print(state.Pose.y)
+print(state.pose.y)
 print('Theta')
-print(state.Pose.theta)
+print(state.pose.theta)
 
 
 while(1):

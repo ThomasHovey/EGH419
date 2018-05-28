@@ -23,14 +23,14 @@ pathy = []
 plt.ion()
 fig = plt.figure()
 ax = fig.add_subplot(111)
-line1, = ax.plot(state.Pose.x, state.Pose.y, 'ro') # Returns a tuple of line objects, thus the comma
-line2, = ax.plot(state.Pose.x, state.Pose.y, 'b.') # Returns a tuple of line objects, thus the comma
+line1, = ax.plot(state.pose.x, state.pose.y, 'ro') # Returns a tuple of line objects, thus the comma
+line2, = ax.plot(state.pose.x, state.pose.y, 'b.') # Returns a tuple of line objects, thus the comma
 # Set limit
 plt.ylim(-500,500)
 plt.xlim(-500,500)
 # Move foward and build database
-state.LeftMotorSpeed = 50
-state.RightMotorSpeed = 50
+state.leftMotorSpeed = 50
+state.rightMotorSpeed = 50
 
 
 place_recog.database_append(state)
@@ -42,16 +42,16 @@ while i < 5:
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
-	state.Time = time.time() - old_time
+	state.time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
 	localization.update(state)
 	# add points to path 
-	pathx.append(state.Pose.x)
-	pathy.append(state.Pose.y)
+	pathx.append(state.pose.x)
+	pathy.append(state.pose.y)
 	# plot new position
-	line1.set_xdata(state.Pose.x)
-	line1.set_ydata(state.Pose.y)
+	line1.set_xdata(state.pose.x)
+	line1.set_ydata(state.pose.y)
 	line2.set_xdata(pathx)
 	line2.set_ydata(pathy)
 	
@@ -62,8 +62,8 @@ while i < 5:
 	place_recog.database_append(state)
 
 # Stop motor
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Finalize databse
@@ -71,8 +71,8 @@ place_recog.database_finalize()
 
 
 # Move backwards until intial position reached
-state.LeftMotorSpeed = -50
-state.RightMotorSpeed = -50
+state.leftMotorSpeed = -50
+state.rightMotorSpeed = -50
 
 # Update motor speeds
 comm.setMotorSpeed(state)
@@ -83,16 +83,16 @@ while i < 50:
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
-	state.Time = time.time() - old_time
+	state.time = time.time() - old_time
 	old_time = time.time()
 	# Update localization
 	localization.update(state)
 	# add points to path 
-	pathx.append(state.Pose.x)
-	pathy.append(state.Pose.y)
+	pathx.append(state.pose.x)
+	pathy.append(state.pose.y)
 	# plot new position
-	line1.set_xdata(state.Pose.x)
-	line1.set_ydata(state.Pose.y)
+	line1.set_xdata(state.pose.x)
+	line1.set_ydata(state.pose.y)
 	line2.set_xdata(pathx)
 	line2.set_ydata(pathy)
 	
@@ -100,14 +100,14 @@ while i < 50:
 	fig.canvas.flush_events()
 	i += 1
 	# Check position for start
-	new_pose, error = place_recog.find_location(state.Pose)
+	new_pose, error = place_recog.find_location(state.pose)
 	
 	if new_pose.x == 0 and new_pose.y == 0:
 		print("Back at start - shutting down")
 		break
 
 # Stop motor
-state.LeftMotorSpeed = 0
-state.RightMotorSpeed = 0
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
