@@ -40,7 +40,7 @@ comm.setMotorSpeed(state)
 old_time = time.time()
 i=0
 desired_pos = Pose(600,0,0,0,0,0)
-while i < 5:
+while i < 10:
 	# Read encoder data ect
 	comm.updateData(state)
 	# Find time 
@@ -116,11 +116,11 @@ text = raw_input("Ready to start mowing?")
 
 
 # Move backwards until intial position reached
-# state.leftMotorSpeed = 15
-# state.rightMotorSpeed = 15
+state.leftMotorSpeed = -15
+state.rightMotorSpeed = -15
 
-# # Update motor speeds
-# comm.setMotorSpeed(state)
+# Update motor speeds
+comm.setMotorSpeed(state)
 desired_pos = Pose(0,0,0,0,0,0)
 
 i=0

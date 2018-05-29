@@ -36,9 +36,9 @@ if text == "b":
 	old_time = time.time()
 
 	for desired_pos in desired_pos_list:
-		while abs(state.pose.x - desired_pos.x) > 50 or abs(state.pose.y - desired_pos.y) > 50  :
-			print("Desired x:" + str(desired_pos.x) + " y:" + str(desired_pos.y))
-			print("Current x:" + str(state.pose.x) + " x:" +str(state.pose.y) + " theta:" + str(state.pose.theta))
+		while abs(state.pose.x - desired_pos.x) > 20 or abs(state.pose.y - desired_pos.y) > 20  :
+			#print("Desired x:" + str(desired_pos.x) + " y:" + str(desired_pos.y))
+			#print("Current x:" + str(state.pose.x) + " x:" +str(state.pose.y) + " theta:" + str(state.pose.theta))
 
 
 			# Read encoder data ect
@@ -48,13 +48,17 @@ if text == "b":
 			old_time = time.time()
 			# Update localization
 			localization.update(state)
+			plotting.update_plot(state.pose)
 
-			# Add img to database
-			database = place_recog.database_append(state.pose)
 
 			# Get motor speeds and update
 			nav.moveToPoint(state, desired_pos)
 			comm.setMotorSpeed(state)
+			# Add img to database
+			database = place_recog.database_append(state.pose)
+
+
+
 
 		print("Reached Node Point")
 		# Stop
@@ -110,20 +114,20 @@ while abs(state.pose.x - target_pose.x) > 50 or abs(state.pose.y - target_pose.y
 
 	# Update plot
 	plotting.update_plot(state.pose)
-	
+	if state.pose.x > 100 and state.pose.y > 100:
 	# Check place recognition
-	pose, error = place_recog.find_location(state.pose)
-	if error != 'NULL':
-		plotting.update_plot_img(state.pose)
-		print("match found: error: " + str(error) )
-		print("Posex: " + str(pose.x))
-		print("Posey: " + str(pose.y))
-		state.pose.x = pose.x
-		state.pose.y = pose.y
-		if state.pose.x > 450 and state.pose.y > 450:
-			break
-	else:
-		print("No image matched")
+		pose, error = place_recog.find_location(state.pose)
+		if error != 'NULL':
+			plotting.update_plot_img(state.pose)
+			print("match found: error: " + str(error) )
+			print("Posex: " + str(pose.x))
+			print("Posey: " + str(pose.y))
+			state.pose.x = pose.x
+			state.pose.y = pose.y
+			if state.pose.x > 250 and state.pose.y > 250:
+				break
+		else:
+			print("No image matched")
 
 	# Get motor speeds and update
 	nav.moveToPoint(state, target_pose)

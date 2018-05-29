@@ -9,15 +9,15 @@ from classes.State import State
 
 # Tuning Constants
 POSE_TOLERANCE = 100
-ERROR_THRESHOLD = 12.0
+ERROR_THRESHOLD = 25.0
 # Empty database
 database = []
 
-img_width = 1439
+img_width = 691#1439
 
 # Setup camera
 camera = PiCamera()
-camera.resolution = (1312,976)#(640,480)
+camera.resolution = (640,480) #(1312,976)
 camera.framerate = 30
 #Wait
 time.sleep(1.0)
@@ -58,10 +58,8 @@ def find_location(pose):
 	img = get_img(pose.theta)
 	database_temp = []
 	for data in database:
-		if (pose.x - data.pose.x < POSE_TOLERANCE and pose.x - data.pose.x > -POSE_TOLERANCE) \
-		and (pose.y - data.pose.y < POSE_TOLERANCE and pose.y - data.pose.y > -POSE_TOLERANCE):
+		if abs(pose.x - data.pose.x) < POSE_TOLERANCE and abs(pose.y - data.pose.y) < POSE_TOLERANCE:
 			database_temp.append(data)
-	database_temp = database
 	print("CHECKING IMAGES")
 	# Return null if not close to boundary
 	if database_temp == []:
