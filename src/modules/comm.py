@@ -4,9 +4,9 @@ from classes.State import State
 from classes.IMU import IMU
 from classes.Compass import Compass
 
-x_offset = -0.04974672#-0.0875724
-y_offset = 0.0007307#0.0150243
-z_offset = -7.4264
+x_offset = -0.11595124#-0.0875724
+y_offset =-0.1251002#0.0150243
+z_offset = -6.2993
 
 def Serial_init():
     global startMarker, endMarker, ArduinoSer

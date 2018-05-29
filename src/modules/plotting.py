@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import math
 
 # Setup length of line for bearing
-unit = 15
+unit = 30
 
 # Create path list
 pathx = []
@@ -62,6 +62,7 @@ def add_database(database):
 
 
 def update_plot(pose):
+	global last_pose
 	while True:
 		acquired = lock_drawing.acquire(0)
 		if acquired:
@@ -109,6 +110,7 @@ def plotting_main():
 	line_boundary.set_ydata(pathy_boundary)
 	line_path.set_xdata(pathx)
 	line_path.set_ydata(pathy)
+
 	heading.set_xdata([last_pose.x, last_pose.x+unit*math.cos(last_pose.theta *(math.pi/180))])
 	heading.set_ydata([last_pose.y, last_pose.y+unit*math.sin(last_pose.theta *(math.pi/180))])
 

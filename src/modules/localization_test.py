@@ -22,9 +22,9 @@ state = State()
 comm.Serial_init()
 
 # Set motor speeds
-state.leftMotorSpeed = 0
-state.rightMotorSpeed = 0
-comm.setMotorSpeed(state)
+state.leftMotorSpeed = -15
+state.rightMotorSpeed = 15
+#comm.setMotorSpeed(state)
 
 # Loop
 old_time = time.time()
@@ -40,10 +40,8 @@ while 1:
 
 	# Update plot
 	plotting.update_plot(state.pose)
-	if i == 5:
-		plotting.draw_plot(state.pose)
-		i = 0
-
+	print(state.pose.theta)
+	# Nav 
 
 	i += 1
 
@@ -53,5 +51,7 @@ state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.pose)
+plotting.draw_plot()
 
+while(1):
+	time.sleep(1)

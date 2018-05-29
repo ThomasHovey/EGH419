@@ -20,14 +20,10 @@ def moveToPoint(state,desired_pose):
 	steering_angle = Kh*(steering_diff)*(math.sqrt(math.pow(min(100,desired_pose.x - state.pose.x),2) + math.pow(min(100,desired_pose.y - state.pose.y),2)))/200
 	if steering_angle > 0.25:
 		v = 0
-		steering_angle = 0.12
+		steering_angle = 0.15
 	elif steering_angle < -0.25:
 		v = 0
-		steering_angle = -0.12
-
-	print("steering angle")
-	print(steering_angle)
-
+		steering_angle = -0.15
 
 	l_motor = v - steering_angle*W/2
 	r_motor = steering_angle*W + l_motor

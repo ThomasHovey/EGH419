@@ -62,7 +62,7 @@ def thread_teleop():
 		time.sleep(0.01)
 
 
-def main():
+def main_build_database():
 	old_time = time.time()
 	while key != FINISH:
 		# Read encoder data ect
@@ -128,7 +128,7 @@ def main():
 
 threading.Thread(target = thread_teleop).start()
 #threading.Thread(target = main).start()
-main()
+main_build_database()
 
 #while key != FINISH:
 plotting.plotting_main()

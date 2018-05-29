@@ -15,7 +15,7 @@ database = []
 
 # Setup camera
 camera = PiCamera()
-camera.resolution = (1312,976)
+camera.resolution = (640,480)
 camera.framerate = 30
 #Wait
 time.sleep(1.0)
