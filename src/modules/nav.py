@@ -9,7 +9,7 @@ W = 100.0
 Kh_t = 9
 
 def moveToPoint(state,desired_pose):
-	v = Kv*math.sqrt(math.pow(min(120,max(80,desired_pose.x - state.pose.x)),2) + math.pow(min(120,max(80,desired_pose.y - state.pose.y)),2))
+	v = Kv*math.sqrt(math.pow(min(120,max(100,desired_pose.x - state.pose.x)),2) + math.pow(min(120,max(100,desired_pose.y - state.pose.y)),2))
 	desired_theta = math.atan2(desired_pose.y - state.pose.y,desired_pose.x - state.pose.x)*(180/math.pi)
 	steering_diff = desired_theta - state.pose.theta
 
@@ -18,12 +18,12 @@ def moveToPoint(state,desired_pose):
 	elif steering_diff < -180:
 		steering_diff = steering_diff +360
 	steering_angle = Kh*(steering_diff)*(math.sqrt(math.pow(min(100,desired_pose.x - state.pose.x),2) + math.pow(min(100,desired_pose.y - state.pose.y),2)))/200
-	if steering_angle > 0.25:
+	if steering_angle > 0.18:
 		v = 0
-		steering_angle = 0.15
-	elif steering_angle < -0.25:
+		steering_angle = 0.18
+	elif steering_angle < -0.18:
 		v = 0
-		steering_angle = -0.15
+		steering_angle = -0.18
 
 	l_motor = v - steering_angle*W/2
 	r_motor = steering_angle*W + l_motor

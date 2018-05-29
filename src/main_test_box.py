@@ -8,6 +8,7 @@ from modules.classes.Pose import Pose
 from modules.classes.ImageData import ImageData
 from modules.classes.State import State
 import modules.comm as comm
+import modules.plotting as plotting
 import modules.nav as nav
 import modules.localization as localization
 import matplotlib.pyplot as plt
@@ -35,7 +36,11 @@ if text == "b":
 	old_time = time.time()
 
 	for desired_pos in desired_pos_list:
-		while abs(state.pose.x - desired_pos.x) > 20 or abs(state.pose.y - desired_pos.y) > 20  :
+		while abs(state.pose.x - desired_pos.x) > 50 or abs(state.pose.y - desired_pos.y) > 50  :
+			print("Desired x:" + str(desired_pos.x) + " y:" + str(desired_pos.y))
+			print("Current x:" + str(state.pose.x) + " x:" +str(state.pose.y) + " theta:" + str(state.pose.theta))
+
+
 			# Read encoder data ect
 			comm.updateData(state)
 			# Find time 
@@ -51,12 +56,15 @@ if text == "b":
 			nav.moveToPoint(state, desired_pos)
 			comm.setMotorSpeed(state)
 
+		print("Reached Node Point")
 		# Stop
 		state.leftMotorSpeed = 0
 		state.rightMotorSpeed = 0
 		comm.setMotorSpeed(state)
 
+
 		# Plot database locations
+		plotting.update_plot(state.pose)
 		plotting.add_database(database)
 
 		# Draw Plot
@@ -90,7 +98,7 @@ text = raw_input("Ready to start mowing?")
 # Loop
 old_time = time.time()
 
-while abs(state.pose.x - target_pose.x) > 20 or abs(state.pose.y - target_pose.y) > 20  :
+while abs(state.pose.x - target_pose.x) > 50 or abs(state.pose.y - target_pose.y) > 50  :
 	
 	# Read encoder data ect
 	comm.updateData(state)
