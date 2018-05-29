@@ -42,7 +42,7 @@ def get_img():
 	img_gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	#Dewarp
 	output = cv2.remap(img_gray,xmap,ymap,cv2.INTER_LINEAR)
-        rawCapture.truncate(0) 
+	rawCapture.truncate(0) 
 	# Resize TODO
 	return output
 

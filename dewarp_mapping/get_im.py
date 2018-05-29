@@ -20,6 +20,12 @@ rawCapture = PiRGBArray(camera)
 
 time.sleep(0.1)
 
+
+# while (1):
+# 	camera.capture(rawCapture, format='rgb')
+# 	cv2.imshow('img.png', rawCapture.array)
+# 	cv2.waitKey(50)
+# 	rawCapture.truncate(0) 
+	
 camera.capture(rawCapture, format='rgb')
 cv2.imwrite('img.png', rawCapture.array)
-

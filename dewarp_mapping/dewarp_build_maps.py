@@ -47,7 +47,7 @@ def unwarp(img,xmap,ymap):
 
 
 #disp = Display((800,600))
-disp = Display((1296,972))
+disp = Display((1312,976))
 vals = []
 last = (0,0)
 # Load the video from the rpi
@@ -89,7 +89,11 @@ Wd = round(float(max(R1, R2)) * 2.0 * np.pi)
 #Hd = (2.0*((R2+R1)/2)*np.pi) * (90/360)
 Hd = (R2-R1)
 Ws = img.width
+print "WS"
+print Ws 
 Hs = img.height
+print "HS"
+print Hs 
 # build the pixel map, this could be sped up
 print "BUILDING MAP!"
 #print "HD value" + str(Hd)
