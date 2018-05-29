@@ -9,15 +9,15 @@ from classes.State import State
 
 # Tuning Constants
 POSE_TOLERANCE = 100
-ERROR_THRESHOLD = 10.0
+ERROR_THRESHOLD = 12.0
 # Empty database
 database = []
 
-img_width = 697
+img_width = 1439
 
 # Setup camera
 camera = PiCamera()
-camera.resolution = (640,480)
+camera.resolution = (1312,976)#(640,480)
 camera.framerate = 30
 #Wait
 time.sleep(1.0)
@@ -48,6 +48,7 @@ def get_img(theta):
 	# Rotate to 0 deg heading
 	roll = 	int(( theta / 360 ) * img_width )
 	output = np.roll(output, -roll, axis=1)
+	#print(output.shape)
 	return output
 
 
@@ -61,7 +62,7 @@ def find_location(pose):
 		and (pose.y - data.pose.y < POSE_TOLERANCE and pose.y - data.pose.y > -POSE_TOLERANCE):
 			database_temp.append(data)
 	database_temp = database
-	
+	print("CHECKING IMAGES")
 	# Return null if not close to boundary
 	if database_temp == []:
 		return Pose(0,0,0,0,0,0), 'NULL'
@@ -77,7 +78,7 @@ def find_location(pose):
 			
 			# Find the avg error
 			error = np.mean(img_diff)
-
+			print("error :" + str(error))
 			# Check if error is below threshold
 			if error < ERROR_THRESHOLD:
 				error_database.append((error, data.pose))
@@ -113,7 +114,6 @@ def database_append(pose):
 	capture = get_img(pose.theta)
 
 	database.append(ImageData(capture,pose))
-	database[len(database)-1].pose.theta = 0
 	#cv2.imwrite('img.png',capture)
 	return database
 

@@ -28,6 +28,7 @@ time.sleep(0.1)
 
 # Init state
 state = State()
+state.pose.theta = 0
 
 # Init serial to arduino
 comm.Serial_init()
@@ -80,6 +81,9 @@ def main_build_database():
 
 			# Add img to database
 			database = place_recog.database_append(state.pose)
+			print(state.pose.x)
+			print(state.pose.y)
+			print(state.pose.theta)
 			# Plot database locations
 			plotting.add_database(database)
 
@@ -189,10 +193,12 @@ while 1:
 	# Check place recognition
 	pose, error = place_recog.find_location(state.pose)
 	if error != 'NULL':
-		plotting.add_img_found(pose,error)
+		plotting.update_plot_img(state.pose)
+		print("match found")
 		state.pose.x = pose.x
 		state.pose.y = pose.y
-		break
+		if abs(state.pose.x - target_pose.x) < 20 and abs(state.pose.y - target_pose.y) < 20:
+			break
 	else:
 		print("No image matched")
 
@@ -209,3 +215,6 @@ comm.setMotorSpeed(state)
 
 # Draw Plot
 plotting.draw_plot()
+
+while(1):
+	time.sleep(1)
