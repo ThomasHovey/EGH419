@@ -1,22 +1,41 @@
-import readchar
-import threading, time, sys
-import pygame
+import cv2
+import numpy as np
+from picamera.array import PiRGBArray
+from picamera import PiCamera 
+import time
+import modules.place_recog as place_recog
+from modules.classes.Pose import Pose
+from modules.classes.ImageData import ImageData
+from modules.classes.State import State
 import modules.plotting as plotting
+from modules.plotting import draw_plot_thread
 import modules.comm as comm
 import modules.localization as localization
 import matplotlib.pyplot as plt
+import math
+import threading, time, sys
+import pygame
 
-
-STOP = 'v' 
+# teleop constant
+FORWARD = 'w'
+LEFT = 'a'
+RIGHT = 'd'
+REVERSE = 's'
 FINISH = 'f'
+STOP = 'v'
+
+# Init state
+state = State()
+
 key = "lol"
 
 pygame.init()
 pygame.display.set_mode((200,200))
 
+
 lock = threading.Lock()
 
-def thread1():
+def thread_teleop():
 	global key
 	while True:
 		lock.acquire()
@@ -36,15 +55,13 @@ def thread1():
 		
 		if key == FINISH:
 			lock.release()
+			print("Exit thread1")
 			sys.exit()
-			print("Exit thread")
 		lock.release()
 		time.sleep(0.01)
 
-threading.Thread(target = thread1).start()
 
-while (1):
-	
+def main():
 	old_time = time.time()
 	while key != FINISH:
 		# Read encoder data ect
@@ -56,16 +73,18 @@ while (1):
 		localization.update(state)
 
 		# Add img to database
-		#place_recog.database_append(state)
+		place_recog.database_append(state)
 
 		# Update plot
-		plotting.update_plot(state.Pose)
+		plotting.update_plot(state.pose)
 
 		# Plot database locations
-		#plotting.add_database(database)
+		plotting.add_database(database)
 
-		while not acquired:
+		while True:
 			acquired = lock.acquire(0)
+			if acquired:
+				break
 		# Get motor speeds from teleop
 		if key == FORWARD:
 			state.leftMotorSpeed = 25
@@ -86,13 +105,30 @@ while (1):
 			state.rightMotorSpeed = 0
 
 		lock.release()
-		
+		time.sleep(0.2)
 		#comm.setMotorSpeed(state)
 
+	print("Exit thread main")
+	sys.exit()
+
+def thread_plot():
+	while(1):
+		time.sleep(0.5)
+		plotting.draw_plot_thread()
+		if key == FINISH:
+			print("Exit thread Plotting")
+			sys.exit()
+
+		
+
+threading.Thread(target = thread_teleop).start()
+#threading.Thread(target = thread_plot).start()
+threading.Thread(target = main).start()
+
+plotting.plotting_main()
 
 
 
 
 
-		lock.release()
-	
+

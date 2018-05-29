@@ -63,7 +63,7 @@ if text == "b":
 		place_recog.database_append(state)
 
 		# Update plot
-		plotting.update_plot(state.Pose)
+		plotting.update_plot(state.pose)
 
 		# Plot database locations
 		plotting.add_database(database)
