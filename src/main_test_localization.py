@@ -54,7 +54,7 @@ state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.pose)
+plotting.draw_plot()
 
 
 ##################
@@ -87,7 +87,7 @@ state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.pose)
+plotting.draw_plot()
 
 ##################
 # Move to (0,300)
@@ -119,7 +119,7 @@ state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.pose)
+plotting.draw_plot()
 
 ##################
 # Move to (0,0)
@@ -150,7 +150,7 @@ state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.pose)
+plotting.draw_plot()
 
 ##################
 # Move to (300,300)
@@ -181,7 +181,7 @@ state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.pose)
+plotting.draw_plot()
 
 print('X')
 print(state.pose.x)

@@ -6,11 +6,11 @@ import math
 
 WIDTH = 1.585
 trust_value_imu = 0.0
-trust_value_encoder = 0.0
-trust_value_desired =  1.0
-trust_value_imu_omega = 0.0
+trust_value_encoder = 1.0
+trust_value_desired =  0.0
+trust_value_imu_omega = 1.0
 trust_value_encoder_omega = 0.0
-trust_value_desired_omega =  1.0
+trust_value_desired_omega =  0.0
 
 a = 4.05
 

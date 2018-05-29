@@ -106,7 +106,7 @@ def main():
 
 		lock.release()
 		time.sleep(0.2)
-		#comm.setMotorSpeed(state)
+		comm.setMotorSpeed(state)
 
 	print("Exit thread main")
 	sys.exit()

@@ -13,7 +13,7 @@ def Serial_init():
     startMarker = 60
     endMarker = 62
     print("Serial initialization...")
-    ArduinoSer = serial.Serial('/dev/ttyACM0', 9600, 8, 'N', 1, timeout=1)
+    ArduinoSer = serial.Serial('/dev/ttyAMA0', 9600, 8, 'N', 1, timeout=1)
     waitForArduino()
     print("Serial ready!!!")
     ArduinoSer.flushInput()
