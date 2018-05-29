@@ -7,6 +7,7 @@ import modules.place_recog as place_recog
 from modules.classes.Pose import Pose
 from modules.classes.ImageData import ImageData
 from modules.classes.State import State
+import modules.nav as nav
 import modules.plotting as plotting
 import modules.comm as comm
 import modules.localization as localization
@@ -33,8 +34,7 @@ comm.Serial_init()
 
 key = "lol"
 
-pygame.init()
-pygame.display.set_mode((200,200))
+
 
 
 lock = threading.Lock()
@@ -79,7 +79,7 @@ def main_build_database():
 		if state.leftMotorSpeed != 0 or state.rightMotorSpeed !=0:
 
 			# Add img to database
-			database = place_recog.database_append(state)
+			database = place_recog.database_append(state.pose)
 			# Plot database locations
 			plotting.add_database(database)
 
@@ -138,7 +138,8 @@ def main_build_database():
 text = raw_input("Build database or load existing? (l or b)")  # Python 2
 
 if text == "b":
-		
+	pygame.init()
+	pygame.display.set_mode((200,200))
 	threading.Thread(target = thread_teleop).start()
 	main_build_database()
 
@@ -153,20 +154,26 @@ else :
 	database = place_recog.load_database()
 
 
+# Draw plot
+plotting.add_database(database)
+plotting.draw_plot()
 
+# Set target
+target_pose = database[len(database)/2].pose
+
+print(target_pose.x)
+print(target_pose.y)	
 
 ## Now database is loaded 
 text = raw_input("Ready to start mowing?")
 
+
+i=0
+
 # Loop
 old_time = time.time()
 
-# Set target
-target_pose = database[len(database)/2].pose
-	
-i=0
-
-while abs(state.pose.x - target_pose.x) < 20 or abs(state.pose.y - target_pose.y) < 20:
+while 1:
 	
 	# Read encoder data ect
 	comm.updateData(state)
@@ -177,22 +184,22 @@ while abs(state.pose.x - target_pose.x) < 20 or abs(state.pose.y - target_pose.y
 	localization.update(state)
 
 	# Update plot
-	plotting.update_plot()
+	plotting.update_plot(state.pose)
 	
 	# Check place recognition
-	pose, error = place_recog.find_location()
-	if error != 'NULL'
+	pose, error = place_recog.find_location(state.pose)
+	if error != 'NULL':
 		plotting.add_img_found(pose,error)
 		state.pose.x = pose.x
 		state.pose.y = pose.y
+		break
 	else:
 		print("No image matched")
 
 	# Get motor speeds and update
 	nav.moveToPoint(state, target_pose)
 	comm.setMotorSpeed(state)
-	if i == 10:
-		plotting.draw_plot(state.pose)
+
 
 
 # Stop
@@ -201,4 +208,4 @@ state.rightMotorSpeed = 0
 comm.setMotorSpeed(state)
 
 # Draw Plot
-plotting.draw_plot(state.pose)
+plotting.draw_plot()

@@ -76,7 +76,7 @@ def main_build_database():
 		if state.leftMotorSpeed != 0 or state.rightMotorSpeed !=0:
 
 			# Add img to database
-			database = place_recog.database_append(state)
+			database = place_recog.database_append(state.pose)
 			# Plot database locations
 			plotting.add_database(database)
 

@@ -13,6 +13,8 @@ ERROR_THRESHOLD = 10.0
 # Empty database
 database = []
 
+img_width = 697
+
 # Setup camera
 camera = PiCamera()
 camera.resolution = (640,480)
@@ -33,7 +35,7 @@ ymap = np.load("modules/data/ymap.npy")
 
 time.sleep(0.1)
 
-def get_img():
+def get_img(theta):
 	# Capture Image
 	camera.capture(rawCapture, format='rgb')
 	# Convert to CV2 img
@@ -43,14 +45,16 @@ def get_img():
 	#Dewarp
 	output = cv2.remap(img_gray,xmap,ymap,cv2.INTER_LINEAR)
 	rawCapture.truncate(0) 
-	# Resize TODO
+	# Rotate to 0 deg heading
+	roll = 	int(( theta / 360 ) * img_width )
+	output = np.roll(output, -roll, axis=1)
 	return output
 
 
 
 def find_location(pose):
 	# Search the data base for images that are close to the current estimated location
-	img = get_img()
+	img = get_img(pose.theta)
 	database_temp = []
 	for data in database:
 		if (pose.x - data.pose.x < POSE_TOLERANCE and pose.x - data.pose.x > -POSE_TOLERANCE) \
@@ -90,6 +94,7 @@ def find_location(pose):
 		# Else return best match
 		else:
 			error_database.sort(key=lambda tup: tup[0])
+			error_database[0][1].theta = pose.theta
 			return (error_database[0][1], error_database[0][0])
 
 def build_database_old():
@@ -100,13 +105,15 @@ def build_database_old():
 			np.save('modules/data/database.npy',database)
 			return database
 		pose = Pose(int(key),0,0,0,0,0)
-		capture = get_img()
+		capture = get_img(0)
 		database.append(ImageData(capture,pose))
 		#cv2.imwrite('img.png',capture)
 
-def database_append(state):
-	capture = get_img()
-	database.append(ImageData(capture,state.pose))
+def database_append(pose):
+	capture = get_img(pose.theta)
+
+	database.append(ImageData(capture,pose))
+	database[len(database)-1].pose.theta = 0
 	#cv2.imwrite('img.png',capture)
 	return database
 

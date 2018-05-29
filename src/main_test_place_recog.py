@@ -33,7 +33,7 @@ state.leftMotorSpeed = 50
 state.rightMotorSpeed = 50
 
 
-place_recog.database_append(state)
+place_recog.database_append(state.pose)
 
 comm.setMotorSpeed(state)
 old_time = time.time()
@@ -59,7 +59,7 @@ while i < 5:
 	fig.canvas.flush_events()
 	i += 1
 	# Append new database point
-	place_recog.database_append(state)
+	place_recog.database_append(state.pose)
 
 # Stop motor
 state.leftMotorSpeed = 0
