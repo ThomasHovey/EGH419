@@ -13,8 +13,10 @@ pathx = []
 pathy = []
 pathx_boundary = []
 pathy_boundary = []
+pathx_img = []
+pathy_img = []
 
-pose = Pose(0,0,0,0,0,0)
+last_pose = Pose(0,0,0,0,0,0)
 
 #Set limits
 yneg = -100
@@ -29,61 +31,85 @@ a = fig.add_subplot(111)
 plt.ylim(yneg,ypos)
 plt.xlim(xneg,xpos)
 
-line_boundary, = a.plot(pose.x, pose.y, 'r+') # Returns a tuple of line objects, thus the comma
-line_path, = a.plot(pose.x, pose.y, 'b.') # Returns a tuple of line objects, thus the comma
+line_boundary, = a.plot(last_pose.x, last_pose.y, 'r+') # Returns a tuple of line objects, thus the comma
+line_path, = a.plot(last_pose.x, last_pose.y, 'b.') # Returns a tuple of line objects, thus the comma
+line_path, = a.plot(last_pose.x, last_pose.y, 'b.') # Returns a tuple of line objects, thus the comma
+
 # Plot heading
-heading, = a.plot([pose.x, pose.x+unit*math.cos(pose.theta *(math.pi/180))], \
-	[pose.y, pose.y+unit*math.sin(pose.theta *(math.pi/180))])
+heading, = a.plot([last_pose.x, last_pose.x+unit*math.cos(last_pose.theta *(math.pi/180))], \
+	[last_pose.y, last_pose.y+unit*math.sin(last_pose.theta *(math.pi/180))])
+
+# Threading
+lock_drawing = threading.Lock()
+threading.Thread(target = thread1).start()
+
 
 def add_database(database):
+	while True:
+		acquired = lock_drawing.acquire(0)
+		if acquired:
+			break
+
+	pathx_bondary = []
+	pathy_boundary = []
 	for i in database:
 		pathx_boundary.append(database[i].pose.x)
 		pathy_boundary.append(database[i].pose.y)
 
+	lock_drawing.release()
+
 def update_plot(pose):
+	while True:
+		acquired = lock_drawing.acquire(0)
+		if acquired:
+			break
 	# Update paths
 	pathx.append(pose.x)
 	pathy.append(pose.y)
+	last_pose = pose
 
-def updata_plot_img(pose):
-	pathx.append(pose.x)
-	pathy.append(pose.y)
+	lock_drawing.release()
+
+def update_plot_img(pose):
+	while True:
+		acquired = lock_drawing.acquire(0)
+		if acquired:
+			break
+	pathx_img.append(pose.x)
+	pathy_img.append(pose.y)
+
+	lock_drawing.release()
 		
 
 
-def draw_plot(pose):
+def draw_plot():
 	
 	# Update data
 	line_boundary.set_xdata(pathx_boundary)
 	line_boundary.set_ydata(pathy_boundary)
 	line_path.set_xdata(pathx)
 	line_path.set_ydata(pathy)
-	heading.set_xdata([pose.x, pose.x+unit*math.cos(pose.theta *(math.pi/180))])
-	heading.set_ydata([pose.y, pose.y+unit*math.sin(pose.theta *(math.pi/180))])
+	heading.set_xdata([last_pose.x, last_pose.x+unit*math.cos(last_pose.theta *(math.pi/180))])
+	heading.set_ydata([last_pose.y, last_pose.y+unit*math.sin(last_pose.theta *(math.pi/180))])
 
 	# Draw
 	fig.canvas.draw()
 	fig.canvas.flush_events()
 
+def draw_plot_thread():
+	time.sleep(1)
+	lock_drawing.acquire()
+	# Update data
 
+	line_boundary.set_xdata(pathx_boundary)
+	line_boundary.set_ydata(pathy_boundary)
+	line_path.set_xdata(pathx)
+	line_path.set_ydata(pathy)
+	heading.set_xdata([last_pose.x, last_pose.x+unit*math.cos(last_pose.theta *(math.pi/180))])
+	heading.set_ydata([last_pose.y, last_pose.y+unit*math.sin(last_pose.theta *(math.pi/180))])
 
+	# Draw
+	fig.canvas.draw()
+	fig.canvas.flush_events()
+	lock_drawing.release()
 
-########################
-# dead code
-########################
-
-# line3.set_xdata(pathx_enc)
-	# line3.set_ydata(pathy_enc)
-	# line4.set_xdata(pathx_IMU)
-	# line4.set_ydata(pathy_IMU)
-	# line5.set_xdata(pathx_des)
-	# line5.set_ydata(pathy_des)
-
-
-	
-	# heading3, = b.plot([encoder.x, encoder.x+unit*math.cos(encoder.theta *(math.pi/180))], \
-	# 	[encoder.y, encoder.y+unit*math.sin(encoder.theta *(math.pi/180))])
-	# heading4, = c.plot([IMU.x, IMU.x+unit*math.cos(IMU.theta *(math.pi/180))], \
-	# 	[IMU.y, IMU.y+unit*math.sin(IMU.theta *(math.pi/180))])
-	# heading5, = d.plot([desired.x, desired.x+unit*math.cos(desired.theta *(math.pi/180))], \
-	# 	[desired.y, desired.y+unit*math.sin(desired.theta *(math.pi/180))])

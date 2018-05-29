@@ -12,6 +12,8 @@ import modules.comm as comm
 import modules.localization as localization
 import matplotlib.pyplot as plt
 import math
+import threading, time, sys
+import pygame
 
 # teleop constant
 FORWARD = 'w'
@@ -19,7 +21,7 @@ LEFT = 'a'
 RIGHT = 'd'
 REVERSE = 's'
 FINISH = 'f'
-
+STOP = 'v'
 # Pause
 time.sleep(0.1)
 
@@ -33,12 +35,22 @@ comm.Serial_init()
 text = raw_input("Build database or load existing? (l or b)")  # Python 2
 
 if text == "b":
+		
+	key = "lol"
+
+	pygame.init()
+	pygame.display.set_mode((200,200))
+
+	lock = threading.Lock()
+
+	threading.Thread(target = thread1).start()
+
 	# Teleop
-	char = raw_input("Drive robot (wasd, f to finalize)")
+	print("Drive robot (wasd, f to finalize)")
 
 	# Loop
 	old_time = time.time()
-	while char != FINISH:
+	while key != FINISH:
 		# Read encoder data ect
 		comm.updateData(state)
 		# Find time 
@@ -52,19 +64,22 @@ if text == "b":
 
 		# Update plot
 		plotting.update_plot(state.Pose)
-		
+
+		# Plot database locations
+		plotting.add_database(database)
+
 		# Get motor speeds from teleop
-		if char == FORWARD:
+		if key == FORWARD:
 			state.leftMotorSpeed = 25
 			state.rightMotorSpeed = 25
-		elif char == REVERSE:
+		elif key == REVERSE:
 			state.leftMotorSpeed = -25
 			state.rightMotorSpeed = -25
-		elif char == LEFT:
+		elif key == LEFT:
 			state.leftMotorSpeed = -20
 			state.rightMotorSpeed = 20
 
-		elif char == RIGHT:
+		elif key == RIGHT:
 			state.leftMotorSpeed = 20
 			state.rightMotorSpeed = -20
 
@@ -74,8 +89,6 @@ if text == "b":
 
 		
 		comm.setMotorSpeed(state)
-
-		char = raw_input()
 
 	# Stop motor
 	state.leftMotorSpeed = 0
@@ -90,9 +103,6 @@ else :
 	database = place_recog.load_database()
 
 
-# Plot database locations
-plotting.add_database(database)
-plotting.draw_plot()
 
 
 ## Now database is loaded 
@@ -142,3 +152,30 @@ comm.setMotorSpeed(state)
 
 # Draw Plot
 plotting.draw_plot(state.pose)
+
+
+
+def thread1():
+	global key
+	while True:
+		lock.acquire()
+		key = STOP
+		pygame.event.get()
+		pressed = pygame.key.get_pressed()
+		if pressed[pygame.K_a]:
+			key = LEFT
+		elif pressed[pygame.K_w]:
+			key = FOWARD
+		elif pressed[pygame.K_s]:
+			key = REVERSE
+		elif pressed[pygame.K_d]:
+			key = RIGHT
+		elif pressed[pygame.K_f]:
+			key = FINISH
+		
+		if key == FINISH:
+			lock.release()
+			sys.exit()
+			print("Exit thread")
+		lock.release()
+		time.sleep(0.01)
