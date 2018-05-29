@@ -47,7 +47,7 @@ def unwarp(img,xmap,ymap):
 
 
 #disp = Display((800,600))
-disp = Display((640,480))
+disp = Display((320,240))
 vals = []
 last = (0,0)
 # Load the video from the rpi

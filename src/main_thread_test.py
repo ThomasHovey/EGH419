@@ -93,14 +93,24 @@ def main_build_database():
 		if key == FORWARD:
 			state.leftMotorSpeed = 15
 			state.rightMotorSpeed = 15
+			comm.setMotorSpeed(state)
+			time.sleep(0.03)
+			state.leftMotorSpeed = 0
+			state.rightMotorSpeed = 0
+			comm.setMotorSpeed(state)
 		elif key == REVERSE:
 			state.leftMotorSpeed = -15
 			state.rightMotorSpeed = -15
+			comm.setMotorSpeed(state)
+			time.sleep(0.03)
+			state.leftMotorSpeed = 0
+			state.rightMotorSpeed = 0
+			comm.setMotorSpeed(state)
 		elif key == LEFT:
 			state.leftMotorSpeed = -15
 			state.rightMotorSpeed = 15
 			comm.setMotorSpeed(state)
-			time.sleep(0.1)
+			time.sleep(0.02)
 			state.leftMotorSpeed = 0
 			state.rightMotorSpeed = 0
 			comm.setMotorSpeed(state)
@@ -109,7 +119,7 @@ def main_build_database():
 			state.leftMotorSpeed = 15
 			state.rightMotorSpeed = -15
 			comm.setMotorSpeed(state)
-			time.sleep(0.1)
+			time.sleep(0.02)
 			state.leftMotorSpeed = 0
 			state.rightMotorSpeed = 0
 			comm.setMotorSpeed(state)
@@ -132,6 +142,63 @@ main_build_database()
 
 #while key != FINISH:
 plotting.plotting_main()
+
+#################
+# Move to position
+#################
+# Set target
+
+target_pose = Pose(500,500,0,0,0,0)
+
+print(target_pose.x)
+print(target_pose.y)	
+
+## Now database is loaded 
+text = raw_input("Ready to start mowing?")
+
+# Loop
+old_time = time.time()
+
+while abs(state.pose.x - target_pose.x) > 50 or abs(state.pose.y - target_pose.y) > 50  :
+	
+	# Read encoder data ect
+	comm.updateData(state)
+	# Find time 
+	state.time = time.time() - old_time
+	old_time = time.time()
+	# Update localization
+	localization.update(state)
+
+	# Update plot
+	plotting.update_plot(state.pose)
+	if state.pose.x > 100 and state.pose.y > 100:
+	# Check place recognition
+		pose, error = place_recog.find_location(state.pose)
+		if error != 'NULL':
+			plotting.update_plot_img(state.pose)
+			print("match found: error: " + str(error) )
+			print("Posex: " + str(pose.x))
+			print("Posey: " + str(pose.y))
+			state.pose.x = pose.x
+			state.pose.y = pose.y
+			if state.pose.x > 250 and state.pose.y > 250:
+				break
+		else:
+			print("No image matched")
+
+	# Get motor speeds and update
+	nav.moveToPoint(state, target_pose)
+	comm.setMotorSpeed(state)
+
+
+
+# Stop
+state.leftMotorSpeed = 0
+state.rightMotorSpeed = 0
+comm.setMotorSpeed(state)
+
+# Draw Plot
+plotting.draw_plot()
 
 while(1):
 	time.sleep(1)

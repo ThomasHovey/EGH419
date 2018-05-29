@@ -18,10 +18,10 @@ def moveToPoint(state,desired_pose):
 	# print("state.pose.theta" + str(state.pose.theta))
 
 	steering_diff = desired_theta - state.pose.theta
-	print(steering_diff)
+	#print(steering_diff)
 	v = min(12,Kv*(math.sqrt(math.pow(min(300,max(90,abs(desired_pose.x - state.pose.x))),2) + \
-		math.pow(min(300,max(90,abs(desired_pose.y - state.pose.y))),2)))/abs(steering_diff*diff_gain))
-	print(v)
+		math.pow(min(300,max(90,abs(desired_pose.y - state.pose.y))),2)))/abs(max(0.01,steering_diff*diff_gain)))
+	#print(v)
 	if steering_diff > 180:
 		steering_diff = steering_diff - 360
 	elif steering_diff < -180:

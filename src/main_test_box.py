@@ -31,7 +31,7 @@ if text == "b":
 	# Build Boundary square
 	##################
 
-	desired_pos_list = [Pose(500,0,0,0,0,0),Pose(500,500,0,0,0,0),Pose(0,500,0,0,0,0),Pose(0,0,0,0,0,0)]
+	desired_pos_list = [Pose(300,0,0,0,0,0),Pose(300,300,0,0,0,0),Pose(0,300,0,0,0,0),Pose(0,0,0,0,0,0)]
 	# Loop
 	old_time = time.time()
 
@@ -91,7 +91,7 @@ plotting.draw_plot()
 #################
 # Set target
 
-target_pose = Pose(600,600,0,0,0,0)
+target_pose = Pose(500,500,0,0,0,0)
 
 print(target_pose.x)
 print(target_pose.y)	
