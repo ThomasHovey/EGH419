@@ -108,6 +108,7 @@ def database_append(state):
 	capture = get_img()
 	database.append(ImageData(capture,state.pose))
 	#cv2.imwrite('img.png',capture)
+	return database
 
 def database_finalize():
 	np.save('modules/data/database.npy',database)

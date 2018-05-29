@@ -8,7 +8,6 @@ from modules.classes.Pose import Pose
 from modules.classes.ImageData import ImageData
 from modules.classes.State import State
 import modules.plotting as plotting
-from modules.plotting import draw_plot_thread
 import modules.comm as comm
 import modules.localization as localization
 import matplotlib.pyplot as plt
@@ -26,6 +25,8 @@ STOP = 'v'
 
 # Init state
 state = State()
+
+comm.Serial_init()
 
 key = "lol"
 
@@ -65,21 +66,24 @@ def main():
 	old_time = time.time()
 	while key != FINISH:
 		# Read encoder data ect
-		#comm.updateData(state)
+		comm.updateData(state)
 		# Find time 
 		state.time = time.time() - old_time
 		old_time = time.time()
 		# Update localization
 		localization.update(state)
 
-		# Add img to database
-		place_recog.database_append(state)
+		if state.leftMotorSpeed != 0 or state.rightMotorSpeed !=0:
+
+			# Add img to database
+			database = place_recog.database_append(state)
+			# Plot database locations
+			plotting.add_database(database)
+
 
 		# Update plot
 		plotting.update_plot(state.pose)
 
-		# Plot database locations
-		plotting.add_database(database)
 
 		while True:
 			acquired = lock.acquire(0)
@@ -87,39 +91,47 @@ def main():
 				break
 		# Get motor speeds from teleop
 		if key == FORWARD:
-			state.leftMotorSpeed = 25
-			state.rightMotorSpeed = 25
+			state.leftMotorSpeed = 15
+			state.rightMotorSpeed = 15
 		elif key == REVERSE:
-			state.leftMotorSpeed = -25
-			state.rightMotorSpeed = -25
+			state.leftMotorSpeed = -15
+			state.rightMotorSpeed = -15
 		elif key == LEFT:
-			state.leftMotorSpeed = -20
-			state.rightMotorSpeed = 20
-
+			state.leftMotorSpeed = -15
+			state.rightMotorSpeed = 15
+			comm.setMotorSpeed(state)
+			time.sleep(0.1)
+			state.leftMotorSpeed = 0
+			state.rightMotorSpeed = 0
+			comm.setMotorSpeed(state)
+			
 		elif key == RIGHT:
-			state.leftMotorSpeed = 20
-			state.rightMotorSpeed = -20
-
+			state.leftMotorSpeed = 15
+			state.rightMotorSpeed = -15
+			comm.setMotorSpeed(state)
+			time.sleep(0.1)
+			state.leftMotorSpeed = 0
+			state.rightMotorSpeed = 0
+			comm.setMotorSpeed(state)
 		else:
 			state.leftMotorSpeed = 0
 			state.rightMotorSpeed = 0
 
 		lock.release()
-		time.sleep(0.2)
-		#comm.setMotorSpeed(state)
+		comm.setMotorSpeed(state)
+
+		time.sleep(0.01)
 
 	print("Exit thread main")
-	sys.exit()
+#	sys.exit()
 		
 
 threading.Thread(target = thread_teleop).start()
-threading.Thread(target = main).start()
+#threading.Thread(target = main).start()
+main()
 
-while key != FINISH:
-	plotting.plotting_main()
+#while key != FINISH:
+plotting.plotting_main()
 
-
-
-
-
-
+while(1):
+	time.sleep(1)

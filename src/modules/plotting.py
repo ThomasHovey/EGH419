@@ -3,6 +3,7 @@ import numpy as np
 import time
 from classes.State import State
 from classes.Pose import Pose
+from classes.ImageData import ImageData
 import matplotlib.pyplot as plt
 import math
 
@@ -20,10 +21,10 @@ pathy_img = []
 last_pose = Pose(0,0,0,0,0,0)
 
 #Set limits
-yneg = -100
-ypos = 400
-xneg = -100
-xpos = 400
+yneg = -200
+ypos = 1000
+xneg = -200
+xpos = 1000
 # Setup plot
 plt.ion()
 fig = plt.figure()
@@ -49,14 +50,16 @@ def add_database(database):
 		acquired = lock_drawing.acquire(0)
 		if acquired:
 			break
+	global pathx_boundary
+	global pathy_boundary
 
-	pathx_bondary = []
+	pathx_boundary = []
 	pathy_boundary = []
 	for i in database:
-		pathx_boundary.append(database[i].pose.x)
-		pathy_boundary.append(database[i].pose.y)
-
+		pathx_boundary.append(i.pose.x)
+		pathy_boundary.append(i.pose.y)
 	lock_drawing.release()
+
 
 def update_plot(pose):
 	while True:
@@ -67,7 +70,6 @@ def update_plot(pose):
 	pathx.append(pose.x)
 	pathy.append(pose.y)
 	last_pose = pose
-
 	lock_drawing.release()
 
 def update_plot_img(pose):
@@ -102,6 +104,7 @@ def plotting_main():
 		acquired = lock_drawing.acquire(0)
 		if acquired:
 			break
+	
 	line_boundary.set_xdata(pathx_boundary)
 	line_boundary.set_ydata(pathy_boundary)
 	line_path.set_xdata(pathx)
@@ -112,7 +115,6 @@ def plotting_main():
 	# Draw
 	fig.canvas.draw()
 	fig.canvas.flush_events()
-
 	lock_drawing.release()
-	time.sleep(0.5)
+	time.sleep(0.01)
 

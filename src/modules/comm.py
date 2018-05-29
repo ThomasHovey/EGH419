@@ -73,7 +73,7 @@ def waitForArduino():
         while ArduinoSer.inWaiting() == 0:
             pass
         msg,cs_error = recvFromArduino()
-        print(msg)
+        #print(msg)
         
 def updateData(state):
     cmdData = []
