@@ -96,10 +96,12 @@ def draw_plot():
 	fig.canvas.draw()
 	fig.canvas.flush_events()
 
-def draw_plot_thread():
-	lock_drawing.acquire()
-	# Update data
 
+def plotting_main():
+	while True:
+		acquired = lock_drawing.acquire(0)
+		if acquired:
+			break
 	line_boundary.set_xdata(pathx_boundary)
 	line_boundary.set_ydata(pathy_boundary)
 	line_path.set_xdata(pathx)
@@ -108,28 +110,9 @@ def draw_plot_thread():
 	heading.set_ydata([last_pose.y, last_pose.y+unit*math.sin(last_pose.theta *(math.pi/180))])
 
 	# Draw
-	#fig.canvas.draw()
-	#fig.canvas.flush_events()
+	fig.canvas.draw()
+	fig.canvas.flush_events()
+
 	lock_drawing.release()
-
-def plotting_main():
-
-	while(1):
-		while True:
-			acquired = lock_drawing.acquire(0)
-			if acquired:
-				break
-		line_boundary.set_xdata(pathx_boundary)
-		line_boundary.set_ydata(pathy_boundary)
-		line_path.set_xdata(pathx)
-		line_path.set_ydata(pathy)
-		heading.set_xdata([last_pose.x, last_pose.x+unit*math.cos(last_pose.theta *(math.pi/180))])
-		heading.set_ydata([last_pose.y, last_pose.y+unit*math.sin(last_pose.theta *(math.pi/180))])
-
-		# Draw
-		fig.canvas.draw()
-		fig.canvas.flush_events()
-
-		lock_drawing.release()
-		time.sleep(0.5)
+	time.sleep(0.5)
 
