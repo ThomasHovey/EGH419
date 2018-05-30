@@ -31,12 +31,12 @@ if text == "b":
 	# Build Boundary square
 	##################
 
-	desired_pos_list = [Pose(300,0,0,0,0,0),Pose(300,300,0,0,0,0),Pose(0,300,0,0,0,0),Pose(0,0,0,0,0,0)]
+	desired_pos_list = [Pose(800,0,0,0,0,0),Pose(800,800,0,0,0,0),Pose(0,800,0,0,0,0),Pose(0,0,0,0,0,0)]
 	# Loop
 	old_time = time.time()
 
 	for desired_pos in desired_pos_list:
-		while abs(state.pose.x - desired_pos.x) > 20 or abs(state.pose.y - desired_pos.y) > 20  :
+		while abs(state.pose.x - desired_pos.x) > 30 or abs(state.pose.y - desired_pos.y) > 30  :
 			#print("Desired x:" + str(desired_pos.x) + " y:" + str(desired_pos.y))
 			#print("Current x:" + str(state.pose.x) + " x:" +str(state.pose.y) + " theta:" + str(state.pose.theta))
 
@@ -48,7 +48,7 @@ if text == "b":
 			old_time = time.time()
 			# Update localization
 			localization.update(state)
-			plotting.update_plot(state.pose)
+			#plotting.update_plot(state.pose)
 
 
 			# Get motor speeds and update
@@ -68,7 +68,7 @@ if text == "b":
 
 
 		# Plot database locations
-		plotting.update_plot(state.pose)
+		#plotting.update_plot(state.pose)
 		plotting.add_database(database)
 
 		# Draw Plot
@@ -79,7 +79,8 @@ if text == "b":
 
 else :
 	database = place_recog.load_database()
-
+	# for data in database:
+	# 	print("x: " + str(data.pose.x) + " y: " + str(data.pose.y))
 
 # Draw plot
 plotting.add_database(database)
@@ -91,57 +92,56 @@ plotting.draw_plot()
 #################
 # Set target
 
-target_pose = Pose(500,500,0,0,0,0)
-
-print(target_pose.x)
-print(target_pose.y)	
-
-## Now database is loaded 
-text = raw_input("Ready to start mowing?")
-
-# Loop
-old_time = time.time()
-
-while abs(state.pose.x - target_pose.x) > 50 or abs(state.pose.y - target_pose.y) > 50  :
-	
-	# Read encoder data ect
-	comm.updateData(state)
-	# Find time 
-	state.time = time.time() - old_time
-	old_time = time.time()
-	# Update localization
-	localization.update(state)
-
-	# Update plot
-	plotting.update_plot(state.pose)
-	if state.pose.x > 100 and state.pose.y > 100:
-	# Check place recognition
-		pose, error = place_recog.find_location(state.pose)
-		if error != 'NULL':
-			plotting.update_plot_img(state.pose)
-			print("match found: error: " + str(error) )
-			print("Posex: " + str(pose.x))
-			print("Posey: " + str(pose.y))
-			state.pose.x = pose.x
-			state.pose.y = pose.y
-			if state.pose.x > 250 and state.pose.y > 250:
-				break
-		else:
-			print("No image matched")
-
-	# Get motor speeds and update
-	nav.moveToPoint(state, target_pose)
-	comm.setMotorSpeed(state)
-
-
-
-# Stop
-state.leftMotorSpeed = 0
-state.rightMotorSpeed = 0
-comm.setMotorSpeed(state)
-
-# Draw Plot
-plotting.draw_plot()
 
 while(1):
-	time.sleep(1)
+	x = raw_input("Enter x pos:")
+	y = raw_input("Enter y pos:")
+
+	target_pose = Pose(int(x),int(y),0,0,0,0)	
+
+	## Now database is loaded 
+	text = raw_input("Ready to start mowing?")
+
+	# Loop
+	old_time = time.time()
+
+	while abs(state.pose.x - target_pose.x) > 20 or abs(state.pose.y - target_pose.y) > 20  :
+		
+		# Read encoder data ect
+		comm.updateData(state)
+		# Find time 
+		state.time = time.time() - old_time
+		old_time = time.time()
+		# Update localization
+		localization.update(state)
+
+		# Update plot
+		plotting.update_plot(state.pose)
+		if state.pose.x > 100 and state.pose.y > 100:
+		# Check place recognition
+			pose, error = place_recog.find_location(state.pose)
+			if error != 'NULL':
+				plotting.update_plot_img(state.pose,pose)
+				print("BOUNDARY IMAGE MATCH - error: " + str(error) )
+				print("Pose x: " + str(pose.x))
+				print("Pose y: " + str(pose.y))
+				#state.pose.x = pose.x
+				#state.pose.y = pose.y
+				if abs(state.pose.x - target_pose.x) < 200  and abs(state.pose.y - target_pose.y) < 200:
+					break
+			else:
+				print("No image matched")
+
+		# Get motor speeds and update
+		nav.moveToPoint(state, target_pose)
+		comm.setMotorSpeed(state)
+
+
+
+	# Stop
+	state.leftMotorSpeed = 0
+	state.rightMotorSpeed = 0
+	comm.setMotorSpeed(state)
+
+	# Draw Plot
+	plotting.draw_plot()

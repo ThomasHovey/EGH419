@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import math
 
 # Setup length of line for bearing
-unit = 30
+unit = 40
 
 # Create path list
 pathx = []
@@ -17,6 +17,9 @@ pathx_boundary = []
 pathy_boundary = []
 pathx_img = []
 pathy_img = []
+pathx_img_robot = []
+pathy_img_robot = []
+
 
 last_pose = Pose(0,0,0,0,0,0)
 
@@ -33,10 +36,10 @@ a = fig.add_subplot(111)
 plt.ylim(yneg,ypos)
 plt.xlim(xneg,xpos)
 
-line_boundary, = a.plot(last_pose.x, last_pose.y, 'r+') # Returns a tuple of line objects, thus the comma
+line_boundary, = a.plot(last_pose.x, last_pose.y, 'r.') # Returns a tuple of line objects, thus the comma
 line_path, = a.plot(last_pose.x, last_pose.y, 'b.') # Returns a tuple of line objects, thus the comma
-line_path, = a.plot(last_pose.x, last_pose.y, 'b.') # Returns a tuple of line objects, thus the comma
-
+line_img, = a.plot(last_pose.x, last_pose.y, 'g*') # Returns a tuple of line objects, thus the comma
+line_img_robot, = a.plot(last_pose.x, last_pose.y, 'go')
 # Plot heading
 heading, = a.plot([last_pose.x, last_pose.x+unit*math.cos(last_pose.theta *(math.pi/180))], \
 	[last_pose.y, last_pose.y+unit*math.sin(last_pose.theta *(math.pi/180))])
@@ -73,14 +76,15 @@ def update_plot(pose):
 	last_pose = pose
 	lock_drawing.release()
 
-def update_plot_img(pose):
+def update_plot_img(robot, pose):
 	while True:
 		acquired = lock_drawing.acquire(0)
 		if acquired:
 			break
 	pathx_img.append(pose.x)
 	pathy_img.append(pose.y)
-
+	pathx_img_robot.append(robot.x)
+	pathy_img_robot.append(robot.y)
 	lock_drawing.release()
 		
 
@@ -92,6 +96,10 @@ def draw_plot():
 	line_boundary.set_ydata(pathy_boundary)
 	line_path.set_xdata(pathx)
 	line_path.set_ydata(pathy)
+	line_img.set_xdata(pathx_img)
+	line_img.set_ydata(pathy_img)
+	line_img_robot.set_xdata(pathx_img_robot)
+	line_img_robot.set_ydata(pathy_img_robot)
 	heading.set_xdata([last_pose.x, last_pose.x+unit*math.cos(last_pose.theta *(math.pi/180))])
 	heading.set_ydata([last_pose.y, last_pose.y+unit*math.sin(last_pose.theta *(math.pi/180))])
 

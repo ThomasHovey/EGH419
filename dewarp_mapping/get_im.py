@@ -6,7 +6,7 @@ import time
 
 # Setup camera
 camera = PiCamera()
-camera.resolution = (320,240)#(1312,976)
+camera.resolution = (1312,976)#(320,240)#(1312,976)
 camera.framerate = 30
 #Wait
 time.sleep(1.0)

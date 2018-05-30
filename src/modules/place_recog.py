@@ -8,16 +8,17 @@ from classes.ImageData import ImageData
 from classes.State import State
 
 # Tuning Constants
-POSE_TOLERANCE = 120
-ERROR_THRESHOLD = 20.0
+POSE_TOLERANCE = 150
+ERROR_THRESHOLD = 32.0
 # Empty database
+global database
 database = []
 
-img_width = 691#1439
+img_width = 1439 #691
 
 # Setup camera
 camera = PiCamera()
-camera.resolution = (320,240) #(1312,976)
+camera.resolution = (1312,976) #(1312,976)
 camera.framerate = 30
 #Wait
 time.sleep(1.0)
@@ -48,19 +49,21 @@ def get_img(theta):
 	# Rotate to 0 deg heading
 	roll = 	int(( theta / 360 ) * img_width )
 	output = np.roll(output, -roll, axis=1)
-	print(output.shape)
+	#print(output.shape)
 	return output
 
 
 
 def find_location(pose):
+	global database
 	# Search the data base for images that are close to the current estimated location
 	img = get_img(pose.theta)
 	database_temp = []
 	for data in database:
+		#print("xdiff: " + str(abs(pose.x - data.pose.x)))
+		#print("ydiff: " + str(abs(pose.y - data.pose.y)))
 		if abs(pose.x - data.pose.x) < POSE_TOLERANCE and abs(pose.y - data.pose.y) < POSE_TOLERANCE:
 			database_temp.append(data)
-	print("CHECKING IMAGES")
 	# Return null if not close to boundary
 	if database_temp == []:
 		return Pose(0,0,0,0,0,0), 'NULL'
@@ -69,6 +72,7 @@ def find_location(pose):
 	else:
 		# Search the close images for one that matches our location
 		error_database = []
+		print("CHECKING IMAGES: Database_temp: " +str(len(database_temp)))
 		for data in database_temp:
 			# Get the difference
 			img_diff = abs(img.astype(int) - data.img.astype(int))
@@ -76,7 +80,7 @@ def find_location(pose):
 			
 			# Find the avg error
 			error = np.mean(img_diff)
-			print("error :" + str(error))
+			#print("error :" + str(error) + " x: " + str(data.pose.x) + " y: " + str(data.pose.y))
 			# Check if error is below threshold
 			if error < ERROR_THRESHOLD:
 				error_database.append((error, data.pose))
@@ -84,7 +88,7 @@ def find_location(pose):
 			im_stack = np.vstack((data.img,img))
 			im_stack = np.vstack((im_stack, img_diff))
 			cv2.imshow("Database img, current image, difference", im_stack)
-			#print("Error is " + str(error))	
+			print("Error is " + str(error))	
 			cv2.waitKey(1)
 
 		# Return null if no matches
@@ -93,10 +97,20 @@ def find_location(pose):
 		# Else return best match
 		else:
 			error_database.sort(key=lambda tup: tup[0])
-			error_database[0][1].theta = pose.theta
-			return (error_database[0][1], error_database[0][0])
+			errors = []
+			for i in error_database:
+				errors.append(i[0])
+			avg_error = np.mean(np.array(errors))
+			print('average error')
+			#print(0.95*avg_error)			
+			if error_database[0][0] < 18.0 or error_database[0][0] < 0.95*avg_error:
+				error_database[0][1].theta = pose.theta
+				return (error_database[0][1], error_database[0][0])
+			else:
+				return Pose(0,0,0,0,0,0), 'NULL'
 
 def build_database_old():
+	global database
 	database = []
 	while 1:
 		key = raw_input("Enter pose x value (press e to finish)")
@@ -109,6 +123,7 @@ def build_database_old():
 		#cv2.imwrite('img.png',capture)
 
 def database_append(pose):
+	global database
 	capture = get_img(pose.theta)
 
 	database.append(ImageData(capture,pose))
@@ -116,11 +131,13 @@ def database_append(pose):
 	return database
 
 def database_finalize():
+	global database
 	np.save('modules/data/database.npy',database)
 	return database
 	
 
 def load_database():
+	global database
 	database = np.load('modules/data/database.npy')
 	return database
 

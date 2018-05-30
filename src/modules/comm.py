@@ -6,7 +6,7 @@ from classes.Compass import Compass
 
 x_offset = -0.11595124#-0.0875724
 y_offset =-0.1251002#0.0150243
-z_offset = -6.2193
+z_offset = -6.53401875#-7.0796625#-5.88109#-6.0111
 
 def Serial_init():
     global startMarker, endMarker, ArduinoSer
@@ -220,7 +220,7 @@ def setMotorSpeed(state):
 def IMU_config():
     ax_list, ay_list, zg_list = [],[],[]
     state = State()
-    for i in range(50):
+    for i in range(200):
         # Read encoder data ect
         updateData(state)
         ax_list.append(state.IMU.x_accel)
