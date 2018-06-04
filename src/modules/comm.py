@@ -6,7 +6,7 @@ from classes.Compass import Compass
 
 x_offset = -0.11595124#-0.0875724
 y_offset =-0.1251002#0.0150243
-z_offset = -6.53401875#-7.0796625#-5.88109#-6.0111
+z_offset = -6.6226125#-6.53401875#-7.0796625#-5.88109#-6.0111
 
 def Serial_init():
     global startMarker, endMarker, ArduinoSer
